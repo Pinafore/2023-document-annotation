@@ -1,0 +1,40 @@
+1、校验客户是否存在接口
+
+url GET
+http://123.55.123.152:8085/zserp-boot/supplier/checkIsNameExist2?name=云香阁&phone=15062251234&id=0
+
+Content-Type: application/json;charset=UTF-8
+
+响应报文：
+{
+    "code": 200,
+    "data": {
+        "message": "成功",
+        "status": false    // false-不存在, true-存在
+    }
+}
+
+
+2、客户新增接口：
+URL POST
+http://123.55.123.152:8085/zserp-boot/supplier/add
+
+请求报文：
+{
+    "supplier": "云香阁2",   // 客户名称
+    "customerType": "2",   // 客户类型    1-团购  2-批发
+    "contacts": "金星2",   // 联系人
+    "telephone": "18013396609",    
+    "email": "511418028@qq.com",
+    "address": "jiangsu nanjing jiang jun da dao",
+    "type": "客户"   // 类型，固定为"客户"
+}
+响应报文：
+{
+    "code": 200,
+    "data": {
+        "message": "成功"
+    }
+}
+
+3、查询客户列表接口：  参考pc端

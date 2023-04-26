@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 5c18836708fb16a8e59bc5a46ed25f4b34ccc0ef zli12321 <60415163+zli12321@users.noreply.github.com> 1678838137 -0400	commit (initial): init
+5c18836708fb16a8e59bc5a46ed25f4b34ccc0ef 73c74ceecbd6a3a35f0cb7e1f4de8fea07143bfe zli12321 <60415163+zli12321@users.noreply.github.com> 1678839106 -0400	commit: add vercel configs
+73c74ceecbd6a3a35f0cb7e1f4de8fea07143bfe 21c1e69fd904a5195ca731a2dacf874f41cbe929 zli12321 <60415163+zli12321@users.noreply.github.com> 1678840349 -0400	commit: trigger redeplloy
+21c1e69fd904a5195ca731a2dacf874f41cbe929 21c1e69fd904a5195ca731a2dacf874f41cbe929 EC2 Default User <ec2-user@ip-172-78-45-176.ec2.internal> 1682482983 +0000	checkout: moving from master to temp_branch
