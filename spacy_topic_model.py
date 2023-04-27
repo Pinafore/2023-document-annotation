@@ -502,12 +502,7 @@ class TopicModel():
                 # get topic words
                 topic_words = ', '.join([tup[0] for tup in ldamodel.get_topic_words(topic_num, top_n=10)])
                 
-                # topic_df = topic_df.append(pd.Series([
-                #     int(topic_num), 
-                #     topic_label,
-                #     round(topic_pct,4), 
-                #     topic_words,
-                #     ]), ignore_index=True)
+                
                 topic_df['text'][str(i)] = self.texts[i]
                 topic_df['topic_model_prediction'][(str(i))] = str(topic_num)
                 topic_df['topic_model_prediction_score'][str(i)] = str(round(topic_pct,4))
