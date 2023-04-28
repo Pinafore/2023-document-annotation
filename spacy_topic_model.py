@@ -667,14 +667,14 @@ class TopicModel():
         topic_res = [[str(k), str(v)] for k, v in result]
         topic_res_num = []
 
-        topic_word_res = {}
+        # topic_word_res = {}
         # print(self.topics)
         for num, prob in result:
             keywords = topics[num]
-            topic_word_res[str(num)] = keywords
+            # topic_word_res[str(num)] = keywords
             topic_res_num.append((num, topics[num]))
 
         # print(topic_res_num)
-        return topic_res, topic_word_res, topic_res_num
+        return topic_res, topic_res_num
     
     

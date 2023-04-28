@@ -26,6 +26,7 @@ class Session():
         self.raw_texts = self.df.text.values.tolist()
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
         self.vectorizer_idf = vectorizer.fit_transform(self.df.text.values.tolist())
+        self.initial = True
 
         if mode != 0:
             if mode == 1 or mode == 2:
@@ -37,10 +38,9 @@ class Session():
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
-                self.alto = NAITM(self.model.get_texts(), self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
-                self.initial = True
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
         else:
-            self.alto = NAITM(self.model.get_texts(), None,  None, self.df, inference_alg, self.vectorizer_idf, len(self.topics), 500, 0)
+            self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0)
 
     def round_trip1(self, label, doc_id, response_time):
         result = dict()
@@ -53,8 +53,8 @@ class Session():
             # print(self.topics)
             random_document, _ = self.alto.recommend_document()
             result['raw_text'] = self.raw_texts[random_document]
-            result['document_id'] = random_document
-            topic_distibution, topic_keywords, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
+            result['document_id'] = str(random_document)
+            topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
             # result['topic_order'] = topic_distibution
             # result['topic_keywords'] = topic_keywords
             result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
@@ -62,4 +62,19 @@ class Session():
             
             # print(result)
         
+            return result
+        elif self.mode == 0:
+            if not self.initial and isinstance(label, str):
+                self.alto.label(int(doc_id), label)
+                
+            self.initial = False
+
+            random_document, _ = self.alto.recommend_document()
+            result['raw_text'] = self.raw_texts[random_document]
+            result['document_id'] = str(random_document)
+            result['prediction'] = 'sport'
+
+            topics = {"1": {"spans": [], "keywords": []}}
+            result['topic'] = topics
+
             return result

@@ -6,7 +6,7 @@ PORT = 8000
 
 # Set the endpoint URL for the POST request
 # url = f"http://{IP_ADDRESS}:{PORT}/api/data"
-url = 'localhost:5010'
+url = 'http://127.0.0.1:5010/recommend_document'
 
 # Define the data to send in the POST request
 data = {  

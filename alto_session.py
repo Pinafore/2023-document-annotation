@@ -127,10 +127,8 @@ class NAITM():
                 print('starting while loop')
                 
                 i = 0
-                while self.doc_probs[max_topic_idx][0][0] in self.recommended_doc_ids and i < len(self.classes):
-                    # self.scores = np.delete(self.scores, max_idx)
-                    # max_idx = np.argmax(self.scores)
-                    # probs.pop(max_topic_idx)
+                # while self.doc_probs[max_topic_idx][0][0] in self.recommended_doc_ids and i < len(self.classes):
+                while self.doc_probs[max_topic_idx][0][0] in self.recommended_doc_ids and i < self.train_length: 
                     probs[max_topic_idx] = -1
                     max_topic_idx = probs.index(max(probs))
                     i += 1
@@ -145,6 +143,9 @@ class NAITM():
 
                 # print('current topic id is {}'.format(max_topic_idx))
                 self.recommended_doc_ids.add(self.doc_probs[max_topic_idx][0][0])
+
+                print('all recommended ids')
+                print(self.recommended_doc_ids)
                 return self.doc_probs[max_topic_idx][0][0], -1
             else:
                 max_idx = np.argmax(self.scores)
@@ -226,7 +227,7 @@ class NAITM():
     def label(self, doc_id, user_label):
         # if self.mode == 1:
         if True:
-            print('\033[1mmode1\033[0m')
+            # print('\033[1mmode1\033[0m')
             # print(type(label_num))
             # label_num = int(label_num)
             if self.is_labeled(doc_id):
@@ -248,6 +249,7 @@ class NAITM():
                         self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
                         self.update_classifier()  
             elif user_label in self.user_label_number_map:  
+                print('all labels have, keep classes same but increase documents')
                 label_num = self.user_label_number_map[user_label]   
                 self.user_labels[doc_id] = label_num
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
@@ -264,7 +266,8 @@ class NAITM():
                     self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
                 
                 if len(self.classes) < 2:
-                    self.update_median_prob(label_num)
+                    if self.mode == 1:
+                        self.update_median_prob(label_num)
                 else:
                     print('-----------')
                     print('start incremental learning')

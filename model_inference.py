@@ -70,13 +70,14 @@ def main():
 
     # for k, v in document_probas.items():
     #     print('Topic {} has {} docs'.format(k, len(v)))
-
+    
+    documents = df.text.values.tolist()
     '''
     Initialize the neural interactive active topic model
     '''
     vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
     vectorizer_idf = vectorizer.fit_transform(df.text.values.tolist())
-    session = NAITM(model.get_texts(), document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 1)
+    session = NAITM(documents, document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 1)
 
 
     doc_count = 0
