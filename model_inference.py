@@ -32,6 +32,8 @@ def main():
                        type=int, default= 300, required=False)
     argparser.add_argument("--inference_alg", help="choose the type of interence you want: logreg, baye, MoDAL" , 
                        type=str, default= 'logreg', required=False)
+    argparser.add_argument("--mode", help="0:base, 1:LDA, 2:SLDA, 3: ETM" , 
+                       type=int, default= 1, required=False)
 
     args = argparser.parse_args()
 
@@ -65,6 +67,8 @@ def main():
     end = time.time()
     print('finish grouping probabs. Took {} seconds'.format(end-start))
 
+ 
+ 
     # print('topic keys are {}'.format(topics.keys()))
     # print('topics are {}'.format(topics))
 
@@ -77,7 +81,7 @@ def main():
     '''
     vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
     vectorizer_idf = vectorizer.fit_transform(df.text.values.tolist())
-    session = NAITM(documents, document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 1)
+    session = NAITM(documents, document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, args.mode)
 
 
     doc_count = 0

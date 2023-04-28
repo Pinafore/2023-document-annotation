@@ -63,17 +63,23 @@ def main():
 
     print('success reading frame...')
 
-    model_path = './Model/ETM.pkl'
+    model_path = './Model/ETM_20.pkl'
     with open(model_path, 'rb') as inp:
-        model = pickle.load(inp)
+        result = pickle.load(inp)
+        model = result['model']
+        document_probas = result['document_probas']
+        doc_topic_probas = result['doc_topic_probas']
+    
 
-    doc_topic = model.get_document_topic_dist()
-    document_probas,  doc_topic_probas = group_docs_to_topics(doc_topic)
+    # print(np.array(document_probas).shape)
+    # print(np.array(doc_topic_probas).shape)
 
     vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
     vectorizer_idf = vectorizer.fit_transform(df.text.values.tolist())
 
-    session = NAITM(documents, document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 20, 500)
+
+    
+    session = NAITM(documents, document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 1)
 
     doc_count = 0
     while doc_count < len(df):
@@ -86,9 +92,10 @@ def main():
         random_document, _ = session.recommend_document()
 
         print()
-        print('New Document {}'.format(random_document))
         print('-----------')
-        print(documents)
+        print('New Document {}'.format(random_document))
+        # print('-----------')
+        # print(documents)
         print('-----------')
 
         print()
@@ -112,15 +119,15 @@ def main():
         val = input("Please enter your decided label below: ")
         print('----------')
 
-        if val.isdigit():
-            user_input = int(val)
-            if user_input >= 0 and user_input < 20:
-                print()
-                print('User input label is {}'.format(user_input))
-                print()
-                session.label(random_document, user_input)
-                doc_count += 1
-
+        # if val.isdigit():
+        # user_input = int(val)
+        # if user_input >= 0 and user_input < 20:
+        print()
+        print('User input label is {}'.format(str(val)))
+        print()
+        session.label(random_document, str(val))
+        doc_count += 1
+        
 
 if __name__ == "__main__":
     main()

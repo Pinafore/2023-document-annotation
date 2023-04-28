@@ -212,7 +212,7 @@ class NAITM():
 
     def update_classifier(self):
         if self.mode == 1:
-            # print('doc topic prob shape {}'.format(self.doc_topic_prob.shape))
+            print('doc topic prob shape {}'.format(self.doc_topic_prob.shape))
             guess_label_probas = self.classifier.predict_proba(self.text_vectorizer[0:self.train_length])
             guess_label_logprobas = self.classifier.predict_log_proba(self.text_vectorizer[0:self.train_length])
             scores = -np.sum(guess_label_probas*guess_label_logprobas*self.doc_topic_prob[:,:len(self.classes)], axis = 1)
@@ -227,6 +227,7 @@ class NAITM():
     def label(self, doc_id, user_label):
         # if self.mode == 1:
         if True:
+            # print('START LABELLING')
             # print('\033[1mmode1\033[0m')
             # print(type(label_num))
             # label_num = int(label_num)

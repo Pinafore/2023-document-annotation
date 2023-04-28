@@ -361,7 +361,11 @@ class TopicModel():
                 #     inferred, _ = self.lda_model.infer(doc)
                 #     # inferred = self.lda_model.estimate(inferred)
                 # else:
-                inferred, _ = self.lda_model.infer(doc)
+                if self.model_type == 'SLDA':
+                    inferred = self.lda_model.estimate(doc)
+                else:
+                    inferred, _ = self.lda_model.infer(doc)
+
 
                 # print(inferred)
                 # break
@@ -648,7 +652,7 @@ class TopicModel():
                     # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
                     result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
                     # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
-                result[str(topic)]['keywords'] = keywords
+                result[str(topic)]['keywords'] = keywords[0]
 
         return result
     
@@ -657,7 +661,7 @@ class TopicModel():
         if self.model_type != 'SLDA':
             inferred, _= self.lda_model.infer(self.maked_docs[doc_id])
         else:
-            inferred, _= self.lda_model.estimate(self.maked_docs[doc_id])
+            inferred = self.lda_model.estimate(self.maked_docs[doc_id])
             
         result = list(enumerate(inferred))
         # print(result)

@@ -9,6 +9,7 @@ import pandas as pd
 import pickle
 from alto_session import NAITM
 from sklearn.feature_extraction.text import TfidfVectorizer
+from Neural_Topic_Model import Neural_Model
 
 doc_dir = './Data/newsgroup_sub_500.json'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
@@ -36,15 +37,19 @@ class Session():
                 self.model.train(num_topics)
                 self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
-                self.word_topic_distributions = self.model.get_word_topic_distribution()
+                # self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
+            elif mode == 3:
+                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), doc_dir)
+                self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
         else:
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0)
 
     def round_trip1(self, label, doc_id, response_time):
         result = dict()
-        if self.mode == 1 or self.mode == 2:
+        if self.mode == 1 or self.mode == 2 or self.mode == 3:
             # if label:
             if not self.initial and isinstance(label, str):
                 self.alto.label(int(doc_id), label)
@@ -55,7 +60,7 @@ class Session():
             result['raw_text'] = self.raw_texts[random_document]
             result['document_id'] = str(random_document)
             topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
-            # result['topic_order'] = topic_distibution
+            result['topic_order'] = topic_distibution
             # result['topic_keywords'] = topic_keywords
             result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
             result['prediction'] = 'sport'
