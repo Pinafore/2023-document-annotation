@@ -20,7 +20,7 @@ import gensim
 import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
 
-USE_MODEL = False
+USE_MODEL = True
 
 class TopicModel():
     def __init__(self, corpus_path, model_type, min_num_topics, num_iters, load_model, save_model, load_path, hypers):
@@ -191,6 +191,7 @@ class TopicModel():
                 for i, ngrams in enumerate(self.data_words_nonstop):
                     y = [0 for _ in range(len(label_set))]
                     null_y = [np.nan for _ in range(len(label_set))]
+                    # corpus.add_doc(ngrams, y=null_y)
                     # if self.labels and type(self.labels[i]) == str:
                     if self.labels and not self.labels[i] == 'None':
                         label = self.labels[i]
@@ -344,6 +345,12 @@ class TopicModel():
         # print('grouping documents...')
         else:
             doc_prob_topic = []
+
+            '''
+            Modify this part to make it infer only once. Instead of using a for loop to do it
+            '''
+
+
 
             if verbose:
                 print('inferring topic probabilities')
@@ -614,7 +621,7 @@ class TopicModel():
 
         return word_topic_distribution
     
-    def get_word_span_prob(self, doc_id, threthold):
+    def get_word_span_prob(self, doc_id, topic_res_num, threthold):
         if threthold <= 0:
             return dict()
         
@@ -626,40 +633,36 @@ class TopicModel():
         # print(doc_span)
         # self.word_topic_distribution
         result = dict()
-        if self.model_type == 'LDA':
-            for j in range(self.num_topics):
-                result[str(j)] = []
+        # if self.model_type == 'LDA':
+        # for j in range(self.num_topics):
+        #     result[str(j)] = []
+        for topic, keywords in topic_res_num:
+            result[str(topic)] = {}
+            result[str(topic)]['spans'] = []
+            result[str(topic)]['score'] = []
 
-            for i, word in enumerate(doc):
-                for topic in range(self.num_topics):
-                    if self.word_topic_distribution[word][topic] >= threthold:
-                        # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
-                        result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
-                        result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
-        elif self.model_type == 'SLDA' or self.model_type == 'LLDA':
-            for j in range(self.num_topics):
-                result[self.label_set[j]] = {}
-                result[self.label_set[j]]['spans'] = []
-                result[self.label_set[j]]['score'] = []
-            # print(result)
+        for i, word in enumerate(doc):
+            # for topic in range(self.num_topics):
+            for topic, keywords in topic_res_num:
+                if self.word_topic_distribution[word][topic] >= threthold:
+                    # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
+                    result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
+                    result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
+                    result[str(topic)]['keywords'] = keywords
 
-            for i, word in enumerate(doc):
-                for topic in range(self.num_topics):
-
-                    # print(result[self.label_set[topic]]['spans'])
-                    # print(result[self.label_set[topic]]['score'])
-                    # result[self.label_set[topic]].append((doc_span[i], self.word_topic_distribution[word][topic]))
-                    if self.word_topic_distribution[word][topic] >= threthold:
-                        result[self.label_set[topic]]['spans'].append([doc_span[i][0], doc_span[i][1]])
-                        result[self.label_set[topic]]['score'].append(str(self.word_topic_distribution[word][topic]))
         return result
     
     def predict_doc_with_probs(self, doc_id, topics):
         # print(topics)
-        inferred, _= self.lda_model.infer(self.maked_docs[doc_id])
+        if self.model_type != 'SLDA':
+            inferred, _= self.lda_model.infer(self.maked_docs[doc_id])
+        else:
+            inferred, _= self.lda_model.estimate(self.maked_docs[doc_id])
+            
         result = list(enumerate(inferred))
         result.sort(key = lambda a: a, reverse= True)
         topic_res = [[str(k), str(v)] for k, v in result]
+        topic_res_num = [(k, topics[num][0]) for k, v in result]
 
         topic_word_res = {}
         # print(self.topics)
@@ -667,6 +670,6 @@ class TopicModel():
             keywords = topics[num][0]
             topic_word_res[str(num)] = keywords
 
-        return topic_res, topic_word_res
+        return topic_res, topic_word_res, topic_res_num
     
     
