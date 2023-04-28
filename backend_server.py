@@ -28,6 +28,7 @@ class Session():
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
         self.vectorizer_idf = vectorizer.fit_transform(self.df.text.values.tolist())
         self.initial = True
+        self.user_labels = set()
 
         if mode != 0:
             if mode == 1 or mode == 2:
@@ -37,7 +38,7 @@ class Session():
                 self.model.train(num_topics)
                 self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
-                # self.word_topic_distributions = self.model.get_word_topic_distribution()
+                self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
             elif mode == 3:
@@ -63,7 +64,12 @@ class Session():
             result['topic_order'] = topic_distibution
             # result['topic_keywords'] = topic_keywords
             result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
-            result['prediction'] = 'sport'
+
+            try:
+                self.user_labels.add(label)
+                result['prediction'] = random.sample(self.user_labels, 1)[0]
+            except:
+                result['prediction'] = ""
             
             # print(result)
         
@@ -77,7 +83,12 @@ class Session():
             random_document, _ = self.alto.recommend_document()
             result['raw_text'] = self.raw_texts[random_document]
             result['document_id'] = str(random_document)
-            result['prediction'] = 'sport'
+
+            try:
+                self.user_labels.add(label)
+                result['prediction'] = random.sample(self.user_labels, 1)[0]
+            except:
+                result['prediction'] = ""
 
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics

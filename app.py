@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 
 
-new_sess = Session(3)
+new_sess = Session(1)
 # new_sess.__init__()
 
 
