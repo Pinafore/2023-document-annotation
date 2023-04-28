@@ -76,7 +76,7 @@ def main():
     '''
     vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
     vectorizer_idf = vectorizer.fit_transform(df.text.values.tolist())
-    session = NAITM(model.get_texts(), document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 0)
+    session = NAITM(model.get_texts(), document_probas,  doc_topic_probas, df, args.inference_alg, vectorizer_idf, 500, 1)
 
 
     doc_count = 0

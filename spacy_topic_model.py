@@ -639,7 +639,7 @@ class TopicModel():
         for topic, keywords in topic_res_num:
             result[str(topic)] = {}
             result[str(topic)]['spans'] = []
-            result[str(topic)]['score'] = []
+            # result[str(topic)]['score'] = []
 
         for i, word in enumerate(doc):
             # for topic in range(self.num_topics):
@@ -647,8 +647,8 @@ class TopicModel():
                 if self.word_topic_distribution[word][topic] >= threthold:
                     # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
                     result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
-                    result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
-                    result[str(topic)]['keywords'] = keywords
+                    # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
+                result[str(topic)]['keywords'] = keywords
 
         return result
     
@@ -660,16 +660,21 @@ class TopicModel():
             inferred, _= self.lda_model.estimate(self.maked_docs[doc_id])
             
         result = list(enumerate(inferred))
-        result.sort(key = lambda a: a, reverse= True)
+        # print(result)
+        # result.sort(key = lambda a: a, reverse= True)
+        result = sorted(result, key=lambda x: x[1], reverse=True)
+        # print(result)
         topic_res = [[str(k), str(v)] for k, v in result]
-        topic_res_num = [(k, topics[num][0]) for k, v in result]
+        topic_res_num = []
 
         topic_word_res = {}
         # print(self.topics)
         for num, prob in result:
-            keywords = topics[num][0]
+            keywords = topics[num]
             topic_word_res[str(num)] = keywords
+            topic_res_num.append((num, topics[num]))
 
+        # print(topic_res_num)
         return topic_res, topic_word_res, topic_res_num
     
     

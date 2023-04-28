@@ -38,25 +38,28 @@ class Session():
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
                 self.alto = NAITM(self.model.get_texts(), self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
+                self.initial = True
         else:
             self.alto = NAITM(self.model.get_texts(), None,  None, self.df, inference_alg, self.vectorizer_idf, len(self.topics), 500, 0)
 
-    def round_trip1(self, label, doc_id, response_time, recommend_val):
+    def round_trip1(self, label, doc_id, response_time):
         result = dict()
         if self.mode == 1 or self.mode == 2:
             # if label:
-            if recommend_val == -1:
+            if not self.initial and isinstance(label, str):
                 self.alto.label(int(doc_id), label)
-                    
+                
+            self.initial = False
+            # print(self.topics)
             random_document, _ = self.alto.recommend_document()
             result['raw_text'] = self.raw_texts[random_document]
             result['document_id'] = random_document
             topic_distibution, topic_keywords, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
-            result['topic_order'] = topic_distibution
+            # result['topic_order'] = topic_distibution
             # result['topic_keywords'] = topic_keywords
             result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
             result['prediction'] = 'sport'
             
-
-
+            # print(result)
+        
             return result

@@ -86,9 +86,9 @@ def nist_recommend():
     # new_label = request.json.get('new_label')
     doc_id = request.json.get('doc_id')
     response_time = request.json.get('response_time')
-    recommend = request.json.get('recommend')
+    # recommend = request.json.get('recommend')
     # result = {}
-    result = new_sess.round_trip1(label, doc_id, response_time, recommend)
+    result = new_sess.round_trip1(label, doc_id, response_time)
 
     result['code'] = 200
     result['msg'] = 'SUCCESS'
