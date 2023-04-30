@@ -53,6 +53,7 @@ class NAITM():
 
         self.simulate_user_data = dict()
         self.user_label_number_map = {}
+        self.reverse_user_label_number_map = {}
 
         '''
         Mode 1 mean using topic modeling. Otherwise, just use active learning
@@ -242,6 +243,7 @@ class NAITM():
                 else:
                     label_num = len(self.classes)
                     self.user_label_number_map[user_label] = label_num
+                    self.reverse_user_label_number_map[label_num] = user_label
                     self.user_labels[doc_id] = label_num
                     self.classes.append(label_num)
                     self.labels_track[self.id_vectorizer_map[doc_id]] = label_num
@@ -288,6 +290,7 @@ class NAITM():
                 self.classes.append(label_num)
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
                 self.user_label_number_map[user_label] = label_num
+                self.reverse_user_label_number_map[label_num] = user_label
                 # self.curr_label_num.append(label_num)
                 self.user_labels[doc_id] = label_num
 
@@ -314,3 +317,14 @@ class NAITM():
                 self.num_docs_labeled += 1
         
     
+    def predict_label(self, doc_id):
+        doc_id = int(doc_id)
+        if len(self.classes) >= 2:
+            print('predicting')
+            result = self.classifier.predict(self.text_vectorizer[doc_id])[0]
+            print('prediction result is {}'.format(result))
+
+            result = self.reverse_user_label_number_map[result]
+            return result
+        else:
+            return "Create at least two labels to start active learning"
