@@ -31,8 +31,11 @@ def group_docs_to_topics(model_inferred):
 save_model_path = './Model/ETM_20.pkl'
 
 with open('./Data/newsgroup_sub_500.pkl', 'rb') as inp:
-        processed_data = pickle.load(inp)
+        saved_data = pickle.load(inp)
 
+
+processed_data = saved_data['texts']
+spans = saved_data['spans']
 # processed_data = processed_data[0:500]
 # Loading a dataset in JSON format. As said, documents must be composed by string sentences
 # documents_raw = json.load(open('all_emails.json', 'r'))
@@ -80,6 +83,10 @@ etm_instance = ETM(
     eval_perplexity = True
 )
 
+
+# print(train_dataset)
+# exit(0)
+
 etm_instance.fit(train_data = train_dataset, test_data=test_dataset)
 
 topics = etm_instance.get_topics(20)
@@ -106,6 +113,8 @@ result = {}
 result['model'] = etm_instance
 result['document_probas'] = document_probas
 result['doc_topic_probas'] = doc_topic_probas
+result['spans'] = spans
+result['get_document_topic_dist'] = doc_topic
 
 with open(save_model_path, 'wb+') as outp:
     pickle.dump(result, outp)

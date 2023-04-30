@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from Neural_Topic_Model import Neural_Model
 
 doc_dir = './Data/newsgroup_sub_500.json'
+etm_doc_dir = './Data/newsgroup_sub_500.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
 num_iter = 600
 load_data = True
@@ -31,13 +32,18 @@ class User():
 
                 self.model.train(num_topics)
                 self.topics = self.model.print_topics(verbose=False)
+                # print(self.topics)
+
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
             elif mode == 3:
-                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), doc_dir)
+                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir)
+                self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
+                self.model.get_topic_word_dist()
+
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
         else:
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0)

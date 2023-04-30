@@ -640,19 +640,25 @@ class TopicModel():
         # if self.model_type == 'LDA':
         # for j in range(self.num_topics):
         #     result[str(j)] = []
-        for topic, keywords in topic_res_num:
+        # for topic, keywords in topic_res_num:
+        for ele in topic_res_num:
+            topic = ele[0]
+            # keywords = ele[1]
             result[str(topic)] = {}
             result[str(topic)]['spans'] = []
             # result[str(topic)]['score'] = []
 
         for i, word in enumerate(doc):
             # for topic in range(self.num_topics):
-            for topic, keywords in topic_res_num:
+            # for topic, keywords in topic_res_num:
+            for ele in topic_res_num:
+                topic = ele[0]
+                keywords = ele[1]
                 if self.word_topic_distribution[word][topic] >= threthold:
                     # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
                     result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
                     # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
-                result[str(topic)]['keywords'] = keywords[0]
+                result[str(topic)]['keywords'] = keywords
 
         return result
     
@@ -676,7 +682,7 @@ class TopicModel():
         for num, prob in result:
             keywords = topics[num]
             # topic_word_res[str(num)] = keywords
-            topic_res_num.append((num, topics[num]))
+            topic_res_num.append((num, keywords))
 
         # print(topic_res_num)
         return topic_res, topic_res_num
