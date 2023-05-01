@@ -656,7 +656,8 @@ class TopicModel():
                 keywords = ele[1]
                 if self.word_topic_distribution[word][topic] >= threthold:
                     # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
-                    result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
+                    if len(doc_span[i])>0 and doc_span[i][0] <= len(self.texts[doc_id]) and doc_span[i][1] <= len(self.texts[doc_id]):
+                        result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
                     # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
                 result[str(topic)]['keywords'] = keywords
 

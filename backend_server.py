@@ -53,6 +53,9 @@ class User():
         if self.mode == 1 or self.mode == 2 or self.mode == 3:
             # if label:
             if not self.initial and isinstance(label, str):
+                self.user_labels.add(label)
+
+            if not self.initial and isinstance(label, str):
                 print('calling self.label...')
                 self.alto.label(int(doc_id), label)
                 
@@ -67,7 +70,7 @@ class User():
             result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
 
             
-            result['prediction'] = self.alto.predict_label(int(doc_id))
+            result['prediction'] = self.alto.predict_label(random_document)
 
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
@@ -77,9 +80,15 @@ class User():
                 
             
             # print(result)
+            print('unique user labels length is {}'.format(len(self.user_labels)))
+            if len(self.user_labels) == 20:
+                self.alto.eval_classifier()
         
             return result
         elif self.mode == 0:
+            if not self.initial and isinstance(label, str):
+                self.user_labels.add(label)
+
             if not self.initial and isinstance(label, str):
                 self.alto.label(int(doc_id), label)
                 
@@ -89,13 +98,18 @@ class User():
             result['raw_text'] = self.raw_texts[random_document]
             result['document_id'] = str(random_document)
 
-            result['prediction'] = self.alto.predict_label(int(doc_id))
+            result['prediction'] = self.alto.predict_label(int(random_document))
 
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
             #     result['prediction'] = "Create at least two labels to start active learning"
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
+
+            print('unique user labels length is {}'.format(len(self.user_labels)))
+            if len(self.user_labels) == 20:
+                self.alto.eval_classifier()
+
 
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics

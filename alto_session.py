@@ -3,6 +3,7 @@ from sklearn.linear_model import SGDClassifier
 from User import User
 from scipy.sparse import vstack
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 # This var means if True, when labeling the same doc, the next recommend doc would 
 # be the same
@@ -54,6 +55,7 @@ class NAITM():
         self.simulate_user_data = dict()
         self.user_label_number_map = {}
         self.reverse_user_label_number_map = {}
+        self.df = df
 
         '''
         Mode 1 mean using topic modeling. Otherwise, just use active learning
@@ -154,12 +156,15 @@ class NAITM():
                 '''
                 Don't show the users an already shown document
                 '''
+
+                # print('length of recommended id is {}'.format(len(self.recommended_doc_ids)))
                 while max_idx in self.recommended_doc_ids:
-                    self.scores = np.delete(self.scores, max_idx)
+                    self.scores[max_idx] = -1
                     try:
                         max_idx = np.argmax(self.scores)
                     except:
                         print('current len of the score list is {}'.format(len(self.scores)))
+                        return None
                 
 
                 print('Classifier in progess...')
@@ -318,13 +323,24 @@ class NAITM():
         
     
     def predict_label(self, doc_id):
+        # print('labels track {}'.format(self.labels_track))
         doc_id = int(doc_id)
+        # print('user_label_number_map is {}'.format(self.user_label_number_map))
         if len(self.classes) >= 2:
-            print('predicting')
+            # print('predicting')
             result = self.classifier.predict(self.text_vectorizer[doc_id])[0]
+            # print('all predictions are {}'.format(result))
+            # print('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
             print('prediction result is {}'.format(result))
-
-            result = self.reverse_user_label_number_map[result]
-            return result
+            return_result = self.reverse_user_label_number_map[result]
+            return return_result
         else:
             return "Create at least two labels to start active learning"
+        
+    def eval_classifier(self):
+        labels = self.df.label.values.tolist()
+        groud_truth = [self.user_label_number_map[ele] for ele in labels]
+        logreg_y_pred= self.classifier.predict(self.text_vectorizer[0:500])
+        accuracy = accuracy_score(groud_truth, logreg_y_pred)
+
+        print('Final accuracy score is {}'.format(accuracy))
