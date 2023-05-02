@@ -14,14 +14,21 @@ save_model = False
 load_model_path = './Model/{}_model_data.pkl'
 num_topics = 20
 inference_alg = 'logreg'
+test_dataset_name = './Data/newsgroup_sub_1000.json'
+USE_TEST_DATA = True
 
 class User():
     def __init__(self, mode):
         self.mode = mode
         self.df = pd.read_json(doc_dir)
         self.raw_texts = self.df.text.values.tolist()
+        self.test_df = None
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
-        self.vectorizer_idf = vectorizer.fit_transform(self.df.text.values.tolist())
+        if USE_TEST_DATA:
+            self.test_df = pd.read_json(test_dataset_name)
+            self.vectorizer_idf = vectorizer.fit_transform(self.test_df['text'])
+        else:
+            self.vectorizer_idf = vectorizer.fit_transform(self.df.text.values.tolist())
         self.initial = True
         self.user_labels = set()
 
@@ -37,16 +44,16 @@ class User():
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
-                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1, self.test_df)
             elif mode == 3:
                 self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir)
                 self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
                 self.model.get_topic_word_dist()
 
-                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1)
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1, self.test_df)
         else:
-            self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0)
+            self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0, self.test_df)
 
     def round_trip1(self, label, doc_id, response_time):
         result = dict()
@@ -81,10 +88,11 @@ class User():
             
             # print(result)
             print('unique user labels length is {}'.format(len(self.user_labels)))
-            if len(self.user_labels) == 20:
-                self.alto.eval_classifier()
+            if len(self.user_labels) >= 2:
+                local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
+                return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
         
-            return result
+            return -1, -1, -1, -1, result
         elif self.mode == 0:
             if not self.initial and isinstance(label, str):
                 self.user_labels.add(label)
@@ -106,12 +114,15 @@ class User():
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
 
-            print('unique user labels length is {}'.format(len(self.user_labels)))
-            if len(self.user_labels) == 20:
-                self.alto.eval_classifier()
-
-
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics
+            print('unique user labels length is {}'.format(len(self.user_labels)))
+            if len(self.user_labels) >= 2:
+                local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
+                return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
+        
+            return -1, -1, -1, -1, result
 
-            return result
+            
+
+  

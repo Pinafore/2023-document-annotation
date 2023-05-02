@@ -1,7 +1,7 @@
 import sqlite3
 
 def read_all_recommendations():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('local_users.db')
     cursor = conn.execute('SELECT * FROM recommendations')
     rows = cursor.fetchall()
 
@@ -9,9 +9,12 @@ def read_all_recommendations():
         # print(row)
         print('Recommendation ID: {}, User ID: {}, Label: {}, Doc ID: {}, Response Time: {}'.format(row[0], row[1], row[2], row[3], row[4]))
         # print(row[5])
-        # print(row[6])
-        if i == 2:
-            break
+        print(row[6])
+        print(row[7])
+        print(row[8])
+        print(row[9])
+        # if i == 2:
+        #     break
 
     conn.close()
 
@@ -30,5 +33,5 @@ def print_users_and_modes():
 
 # Call the function to print user and mode information
 read_all_recommendations()
-print_users_and_modes()
+# print_users_and_modes()
 

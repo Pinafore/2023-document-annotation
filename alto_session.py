@@ -9,9 +9,15 @@ from sklearn.metrics import accuracy_score
 # be the same
 switch_doc = True
 
+# This variable means if you create a global classifier, then you predeciding there
+# are 20 topics in the classifier. Then test the accuracy of the global classifier
+# on both the training and the testing dataset
+global_classifier = True
+
+
 #NATM stands for neural interactive active topic modeling
 class NAITM():
-    def __init__(self, documents, doc_prob, doc_topic_prob, df, running_type, text_vectorizer, train_len, mode):
+    def __init__(self, documents, doc_prob, doc_topic_prob, df, running_type, text_vectorizer, train_len, mode, test_dataset_frame):
         """
         Documents: the text corpus
         Doc_prob: a dictionary contains all the topics. Each topic 
@@ -27,7 +33,7 @@ class NAITM():
         self.num_docs_labeled = 0
         self.last_recommended_topic = None
         self.recommended_doc_ids = set()
-        self.text_vectorizer = text_vectorizer
+        self.text_vectorizer = text_vectorizer[0:train_len]
         
         self.train_length = train_len
         self.id_vectorizer_map = {}
@@ -47,14 +53,21 @@ class NAITM():
         Parameters or regressor can be changed later
         '''
         self.classifier = self.initialize_classifier(running_type)
+        if global_classifier:
+            unique_labels = np.unique(df.label.values.tolist())
+            self.global_classifier = self.initialize_classifier(running_type)
+            self.global_classes = unique_labels
+            self.test_texts = text_vectorizer[train_len:train_len+100]
+            self.test_labels = test_dataset_frame.label.values.tolist()[train_len:train_len+100]
+            
 
         # Stores and track labeled documents and labels
         self.documents_track = None
         self.labels_track = []
 
         self.simulate_user_data = dict()
-        self.user_label_number_map = {}
-        self.reverse_user_label_number_map = {}
+        # self.user_label_number_map = {}
+        # self.reverse_user_label_number_map = {}
         self.df = df
 
         '''
@@ -239,33 +252,37 @@ class NAITM():
             # label_num = int(label_num)
             if self.is_labeled(doc_id):
                 if user_label in self.user_label_number_map:
-                    label_num = self.user_label_number_map[user_label]
-                    self.user_labels[doc_id] = label_num
-                    self.labels_track[self.id_vectorizer_map[doc_id]] = label_num
+                    # label_num = self.user_label_number_map[user_label]
+                    self.user_labels[doc_id] = user_label
+                    self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
                     if len(self.classes) >= 2:
                         self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
                         self.update_classifier()
+                        if global_classifier:
+                            self.global_classifier.partial_fit(self.documents_track, self.labels_track, self.global_classes)
                 else:
-                    label_num = len(self.classes)
-                    self.user_label_number_map[user_label] = label_num
-                    self.reverse_user_label_number_map[label_num] = user_label
-                    self.user_labels[doc_id] = label_num
-                    self.classes.append(label_num)
-                    self.labels_track[self.id_vectorizer_map[doc_id]] = label_num
+                    # label_num = len(self.classes)
+                    # self.user_label_number_map[user_label] = label_num
+                    # self.reverse_user_label_number_map[label_num] = user_label
+                    self.user_labels[doc_id] = user_label
+                    self.classes.append(user_label)
+                    self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
                     if len(self.classes) >= 2:
                         self.classifier = self.initialize_classifier('logreg')
                         self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
                         self.update_classifier()  
-            elif user_label in self.user_label_number_map:  
+                        if global_classifier:
+                            self.global_classifier.partial_fit(self.documents_track, self.labels_track, self.global_classes)
+            elif user_label in self.classes:  
                 print('all labels have, keep classes same but increase documents')
-                label_num = self.user_label_number_map[user_label]   
-                self.user_labels[doc_id] = label_num
+                # label_num = self.user_label_number_map[user_label]   
+                self.user_labels[doc_id] = user_label
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
                 # print(self.id_vectorizer_map)
                 '''
                 Adding documents and labels and track them
                 '''
-                self.labels_track.append(label_num)
+                self.labels_track.append(user_label)
                 # self.id_vectorizer_map[doc_id] = len(self.labels_track-1)
                 # self.documents_track.append(self.docs[doc_id])
                 if self.text_vectorizer == None:
@@ -275,7 +292,8 @@ class NAITM():
                 
                 if len(self.classes) < 2:
                     if self.mode == 1:
-                        self.update_median_prob(label_num)
+                        # self.update_median_prob(label_num)
+                        self.update_median_prob(self.last_recommended_topic)
                 else:
                     print('-----------')
                     print('start incremental learning')
@@ -284,6 +302,8 @@ class NAITM():
                     # self.classifier.partial_fit(self.text_vectorizer[doc_id], [label_num], self.classes)
 
                     self.update_classifier()
+                    if global_classifier:
+                            self.global_classifier.partial_fit(self.documents_track, self.labels_track, self.global_classes)
                     
 
                 self.num_docs_labeled += 1
@@ -291,15 +311,15 @@ class NAITM():
                 print('\033[1mnum docs labeled {}\033[0m'.format(self.num_docs_labeled))
             else:
                 print('\033[1mImplement this part: Creating a new label\033[0m')
-                label_num = len(self.classes)
-                self.classes.append(label_num)
+                # label_num = len(self.classes)
+                self.classes.append(user_label)
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
-                self.user_label_number_map[user_label] = label_num
-                self.reverse_user_label_number_map[label_num] = user_label
+                # self.user_label_number_map[user_label] = user_label
+                # self.reverse_user_label_number_map[label_num] = user_label
                 # self.curr_label_num.append(label_num)
-                self.user_labels[doc_id] = label_num
+                self.user_labels[doc_id] = user_label
 
-                self.labels_track.append(label_num)
+                self.labels_track.append(user_label)
                 if self.text_vectorizer == None:
                     self.documents_track = self.text_vectorizer[doc_id]
                 else:
@@ -307,7 +327,8 @@ class NAITM():
 
                 if len(self.classes) < 2:
                     if self.mode == 1:
-                        self.update_median_prob(label_num)
+                        # self.update_median_prob(label_num)
+                        self.update_median_prob(self.last_recommended_topic)
                 else:
                     print('-----------')
                     print('start incremental learning')
@@ -317,6 +338,8 @@ class NAITM():
                     # self.classifier.partial_fit(self.text_vectorizer[doc_id], [label_num], self.classes)
 
                     self.update_classifier()
+                    if global_classifier:
+                            self.global_classifier.partial_fit(self.documents_track, self.labels_track, self.global_classes)
                     
 
                 self.num_docs_labeled += 1
@@ -332,15 +355,38 @@ class NAITM():
             # print('all predictions are {}'.format(result))
             # print('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
             print('prediction result is {}'.format(result))
-            return_result = self.reverse_user_label_number_map[result]
-            return return_result
+            
+            return result
         else:
             return "Create at least two labels to start active learning"
         
     def eval_classifier(self):
-        labels = self.df.label.values.tolist()
-        groud_truth = [self.user_label_number_map[ele] for ele in labels]
-        logreg_y_pred= self.classifier.predict(self.text_vectorizer[0:500])
-        accuracy = accuracy_score(groud_truth, logreg_y_pred)
+        local_training_preds = self.classifier.predict(self.documents_track)
+        local_training_acc = accuracy_score(self.labels_track, local_training_preds)
+        if len(self.classes) >= 20 and global_classifier:
+            local_testing_preds = self.classifier.predict(self.test_texts)
+            local_testing_acc = accuracy_score(self.test_labels, local_testing_preds)
 
-        print('Final accuracy score is {}'.format(accuracy))
+            print('local testing accuracy score is {}'.format(local_testing_acc))
+        else:
+            local_testing_acc = -1
+
+        if global_classifier:
+            global_training_preds = self.global_classifier.predict(self.text_vectorizer)
+            global_training_acc = accuracy_score(self.df.label.values.tolist(), global_training_preds)
+            global_testing_preds = self.classifier.predict(self.test_texts)
+            global_testing_acc = accuracy_score(self.test_labels, global_testing_preds)
+
+            print('global training accuracy score is {}'.format(global_training_acc))
+            print('global testing accuracy score is {}'.format(global_testing_acc))
+        else:
+            global_training_acc = -1
+            global_testing_acc = -1
+
+        # labels = self.df.label.values.tolist()
+        # groud_truth = [self.user_label_number_map[ele] for ele in labels]
+        # logreg_y_pred= self.classifier.predict(self.text_vectorizer[0:500])
+        # accuracy = accuracy_score(groud_truth, logreg_y_pred)
+
+        print('local training accuracy score is {}'.format(local_training_acc))
+        return local_training_acc, local_testing_acc, global_training_acc, global_testing_acc
