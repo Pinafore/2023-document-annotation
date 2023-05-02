@@ -20,18 +20,41 @@ def read_all_recommendations():
 
 
 def print_users_and_modes():
-    with sqlite3.connect('users.db') as conn:
+    with sqlite3.connect('local_users.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, mode FROM users")
+        cursor.execute("SELECT id, global_training_acc FROM users")
         rows = cursor.fetchall()
 
-    print("User ID | Mode")
+    print("User ID | global_training_acc")
     print("--------+------")
     for row in rows:
         user_id, mode = row
         print(f"{user_id:7} | {mode}")
 
 # Call the function to print user and mode information
-read_all_recommendations()
+# read_all_recommendations()
 # print_users_and_modes()
+
+import sqlite3
+
+def create_connection(database='local_users.db'):
+    conn = sqlite3.connect(database)
+    return conn
+
+conn = create_connection()
+cursor = conn.execute('SELECT global_training_acc FROM recommendations WHERE user_id = ?', (1,))
+
+# Fetch all rows with user_id = 1
+rows = cursor.fetchall()
+
+# If you want to fetch only the first row with user_id = 1, use cursor.fetchone() instead
+# row = cursor.fetchone()
+
+# Close the connection
+conn.close()
+
+# Print the global_training_acc values for user_id = 1
+for row in rows:
+    print(row[0])
+
 
