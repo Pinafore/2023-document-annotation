@@ -10,7 +10,7 @@ incremental_classifier = SGDClassifier(loss="log", penalty="l2", max_iter=1000, 
 
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 train_len = 500
-test_len = 88
+test_len = 100
 
 test_df = pd.read_json(test_dataset_name)
 vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))

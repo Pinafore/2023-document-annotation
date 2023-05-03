@@ -372,8 +372,8 @@ class NAITM():
             local_testing_acc = -1
 
         if global_classifier:
-            global_training_preds = self.global_classifier.predict(self.text_vectorizer)
-            global_training_acc = accuracy_score(self.df.label.values.tolist(), global_training_preds)
+            global_training_preds = self.global_classifier.predict(self.text_vectorizer[0:self.train_length])
+            global_training_acc = accuracy_score(self.df.label.values.tolist()[0:self.train_length], global_training_preds)
             global_testing_preds = self.classifier.predict(self.test_texts)
             global_testing_acc = accuracy_score(self.test_labels, global_testing_preds)
 
