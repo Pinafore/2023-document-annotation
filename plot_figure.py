@@ -95,10 +95,10 @@ def read_user_accuracy_np(data_path):
 
 
 # print_users_and_modes('local_users.db')
-save_path = './plot_results/test_accuracy_plot.png'
+save_path = './plot_results/train_accuracy_plot.png'
 
 database_name = 'local_users.db'
-acc_type = 'global_testing_acc'
+acc_type = 'global_training_acc'
 LA_session_acc = read_accuracy_db(1, database_name, acc_type)
 LDA_session_acc = read_accuracy_db(2, database_name, acc_type)
 SLDA_session_acc = read_accuracy_db(3, database_name, acc_type)
@@ -114,7 +114,7 @@ print(LDA_session_acc[0:20])
 data_to_plot = {
                 'number documents labeled': [i+1 for i in range(min_len)] * 5,
 
-                'training acc': LA_session_acc[2:] + logistic_acc[3].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
+                'training acc': LA_session_acc[2:] + logistic_acc[2].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
                 'model': ['LA session'] * min_len + ['ordered acc'] * min_len + ['LDA session'] * min_len + ['SLDA session'] * min_len + ['ETM session'] * min_len
                 }
 
