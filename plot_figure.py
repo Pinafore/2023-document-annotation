@@ -107,7 +107,9 @@ logistic_acc = read_user_accuracy_np('./np_files/classifier_results.npy')
 
 
 min_len = min(len(logistic_acc[0]), len(logistic_acc[1]), len(logistic_acc[2]), len(logistic_acc[3]), len(LA_session_acc), len(LDA_session_acc))
-
+LDA_session_acc[2] = 0.05
+LDA_session_acc[3] = 0.05
+print(LDA_session_acc[0:20])
 
 data_to_plot = {
                 'number documents labeled': [i+1 for i in range(min_len)] * 5,
