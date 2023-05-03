@@ -24,9 +24,9 @@ class Neural_Model():
         with open(data_path, 'rb') as inp:
             saved_data = pickle.load(inp)
         
-        self.data_words_nonstop = saved_data['texts']
+        self.data_words_nonstop = saved_data['datawords_nonstop']
         self.word_spans = saved_data['spans']
-        self.texts = pd.read_json(dataset_dir).text.values.tolist()
+        self.texts = saved_data['texts']
 
     def get_topic_word_dist(self):
         topic_word_dist = self.model.get_topic_word_dist().cpu().numpy()

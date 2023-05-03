@@ -35,8 +35,8 @@ def create_neural_model_and_save(num_topics, dataset):
     with open(dataset, 'rb') as inp:
         saved_data = pickle.load(inp)
 
-
-    processed_data = saved_data['texts']
+   
+    processed_data = saved_data['datawords_nonstop']
     spans = saved_data['spans']
     # processed_data = processed_data[0:500]
     # Loading a dataset in JSON format. As said, documents must be composed by string sentences
@@ -46,7 +46,7 @@ def create_neural_model_and_save(num_topics, dataset):
     # documents_raw = pd.read_json(corpus_file)
     # documents_raw = documents_raw.text.values.tolist()
     # documents = [document for document in documents_raw]
-
+    
     documents = [' '.join(doc) for doc in processed_data]
 
     # Preprocessing the dataset
@@ -121,7 +121,7 @@ def create_neural_model_and_save(num_topics, dataset):
     with open(save_model_path, 'wb+') as outp:
         pickle.dump(result, outp)
 
-    
-file = './Data/newsgroup_sub_500.pkl'
 
-create_neural_model_and_save(22, file)
+file = './Data/newsgroup_sub_500_processed.pkl'
+
+create_neural_model_and_save(20, file)

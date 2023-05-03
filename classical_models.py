@@ -19,5 +19,8 @@ import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
 
 class Classical_Model():
-    def __init__(self, model_path, data_path, dataset_dir)):
+    def __init__(self, model_path, data_path, dataset_dir):
+         with open(data_path, 'rb') as inp:
+            self.loaded_data = pickle.load(inp)
+
         
