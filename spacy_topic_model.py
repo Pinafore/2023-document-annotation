@@ -20,7 +20,7 @@ import gensim
 import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
 
-USE_MODEL = True
+USE_MODEL = False
 
 class TopicModel():
     def __init__(self, corpus_path, model_type, min_num_topics, num_iters, load_model, save_model, load_path, hypers):
@@ -275,10 +275,11 @@ class TopicModel():
             print('starting training...')
 
             # print('total # topics {}'.format(mdl.k))
-            # for i in range(0, self.num_iters, 10):
-            #     # print('training iter {}'.format(i))
-            #     mdl.train(10)
-            mdl.train(self.num_iters)
+            for i in range(0, self.num_iters, 10):
+                # print('training iter {}'.format(i))
+                mdl.train(10)
+                print(f'Iteration: {i}, Log-likelihood: {mdl.ll_per_word}, Perplexity: {mdl.perplexity}')
+            # mdl.train(self.num_iters)
             
 
             mdl.save('./Model/{}_model_{}.bin'.format(self.model_type, self.corpus_data))
@@ -331,7 +332,7 @@ class TopicModel():
         probabilities stored with the highest order
         '''
 
-        if self.load_model and 'topics_probs' in self.read_data:
+        if self.load_model and 'topics_probs' in self.read_data and USE_MODEL:
             if self.read_data:
                 self.topics_probs = self.read_data['topics_probs']
                 doc_prob_topic = self.read_data['doc_prob_topic']

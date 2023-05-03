@@ -8,7 +8,7 @@ from Neural_Topic_Model import Neural_Model
 doc_dir = './Data/newsgroup_sub_500.json'
 etm_doc_dir = './Data/newsgroup_sub_500.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
-num_iter = 600
+num_iter = 1200
 load_data = True
 save_model = False
 load_model_path = './Model/{}_model_data.pkl'
@@ -16,6 +16,9 @@ num_topics = 20
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = True
+USE_PROCESSED_TEXT = False
+training_length = 500
+
 
 class User():
     def __init__(self, mode):
@@ -24,7 +27,10 @@ class User():
         self.raw_texts = self.df.text.values.tolist()
         self.test_df = None
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
-        if USE_TEST_DATA:
+        
+        if USE_PROCESSED_TEXT:
+            self.vectorizer_idf = None
+        elif USE_TEST_DATA:
             self.test_df = pd.read_json(test_dataset_name)
             self.vectorizer_idf = vectorizer.fit_transform(self.test_df['text'])
         else:
@@ -44,16 +50,16 @@ class User():
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
-                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1, self.test_df)
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
             elif mode == 3:
-                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir)
+                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir, doc_dir)
                 self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
                 self.model.get_topic_word_dist()
 
-                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, 500, 1, self.test_df)
+                self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
         else:
-            self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, 500, 0, self.test_df)
+            self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df)
 
     def round_trip1(self, label, doc_id, response_time):
         result = dict()

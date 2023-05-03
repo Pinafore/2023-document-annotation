@@ -95,36 +95,36 @@ def read_user_accuracy_np(data_path):
 
 
 # print_users_and_modes('local_users.db')
-save_path = './plot_results/train_accuracy_plot_active_SLDA500.png'
+save_path = './plot_results/iter1000train_accuracy_plot_active_ETM500.png'
 
 database_name = 'local_users.db'
 acc_type = 'global_training_acc'
 
-
+# print_users_and_modes(database_name); exit(0)
 
 LA_session_acc = read_accuracy_db(1, database_name, acc_type)
-LDA_session_acc = read_accuracy_db(2, database_name, acc_type)
+LDA_session_acc = read_accuracy_db(26, database_name, acc_type)
 SLDA_session_acc = read_accuracy_db(3, database_name, acc_type)
 ETM_session_acc = read_accuracy_db(4, database_name, acc_type)
 logistic_acc = read_user_accuracy_np('./np_files/classifier_results.npy')
 
 
-min_len = min(len(logistic_acc[0]), len(logistic_acc[1]), len(logistic_acc[2]), len(logistic_acc[3]), len(LA_session_acc), len(LDA_session_acc))
+# min_len = min(len(logistic_acc[0]), len(logistic_acc[1]), len(logistic_acc[2]), len(logistic_acc[3]), len(LA_session_acc), len(LDA_session_acc))
 LDA_session_acc[2] = 0.05
 LDA_session_acc[3] = 0.05
 print(LDA_session_acc[0:20])
 
-data_to_plot = {
-                'number documents labeled': [i+1 for i in range(min_len)] * 5,
+# data_to_plot = {
+#                 'number documents labeled': [i+1 for i in range(min_len)] * 5,
 
-                'training acc': LA_session_acc[2:] + logistic_acc[2].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
-                'model': ['LA session'] * min_len + ['ordered acc'] * min_len + ['LDA session'] * min_len + ['SLDA session'] * min_len + ['ETM session'] * min_len
-                }
+#                 'training acc': LA_session_acc[2:] + logistic_acc[2].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
+#                 'model': ['LA session'] * min_len + ['ordered acc'] * min_len + ['LDA session'] * min_len + ['SLDA session'] * min_len + ['ETM session'] * min_len
+#                 }
 
-min_len = min(len(LA_session_acc[2:]), len(SLDA_session_acc))
+min_len = min(len(LA_session_acc[2:]), len(ETM_session_acc))
 data_to_plot = {    
                 'number documents labeled': [i+3 for i in range(min_len)] * 2,
-                'training acc': LA_session_acc[2:]+ SLDA_session_acc[2:],
+                'training acc': LA_session_acc[2:]+ ETM_session_acc[2:],
                 'model': ['active fitting'] * min_len + ['LDA fitting'] * min_len
 
                 }

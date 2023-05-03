@@ -10,7 +10,7 @@ from alto_session import NAITM
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Neural_Model():
-    def __init__(self, model_path, data_path):
+    def __init__(self, model_path, data_path, dataset_dir):
         with open(model_path, 'rb') as inp:
             self.loaded_data = pickle.load(inp)
 
@@ -26,6 +26,7 @@ class Neural_Model():
         
         self.data_words_nonstop = saved_data['texts']
         self.word_spans = saved_data['spans']
+        self.texts = pd.read_json(dataset_dir).text.values.tolist()
 
     def get_topic_word_dist(self):
         topic_word_dist = self.model.get_topic_word_dist().cpu().numpy()
@@ -102,9 +103,14 @@ class Neural_Model():
                 # if self.word_topic_distribution[word][topic] >= threthold:
                 try:
                     if self.topic_word_dist[topic][word] >= threthold:
-                        # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
-                        result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
-                        # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
+
+                        '''
+                        改这里
+                        '''
+                        if len(doc_span[i])>0 and doc_span[i][0] <= len(self.texts[doc_id]) and doc_span[i][1] <= len(self.texts[doc_id]):
+                            # result[str(topic)].append((doc_span[i], self.word_topic_distribution[word][topic]))
+                            result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
+                            # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
                 except:
                     result[str(topic)]['spans'].append([])
 
