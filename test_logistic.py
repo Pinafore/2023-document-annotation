@@ -41,8 +41,8 @@ for i in range(train_len):
         test_acc = accuracy_score(test_label, testing_pred)
 
         incremental_classifier.partial_fit(train_set[0:i+1], train_label[0:i+1], classes)
-        incremental_training_pred = incremental_classifier.predict(train_set[0:i+1])
-        incremental_training_acc = accuracy_score(labels[0:i+1], incremental_training_pred)
+        incremental_training_pred = incremental_classifier.predict(train_set)
+        incremental_training_acc = accuracy_score(train_label, incremental_training_pred)
 
         incremental_testing_pred = incremental_classifier.predict(test_set)
         incremental_testing_acc = accuracy_score(test_label, incremental_testing_pred)
