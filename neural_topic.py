@@ -83,7 +83,7 @@ def create_neural_model_and_save(num_topics, dataset):
         embeddings=embeddings_mapping, # You can pass here the path to a word2vec file or
                                     # a KeyedVectors instance
         num_topics=num_topics,
-        epochs=600,
+        epochs=1500,
         debug_mode=True,
         train_embeddings=True, # Optional. If True, ETM will learn word embeddings jointly with
                                 # topic embeddings. By default, is False. If 'embeddings' argument

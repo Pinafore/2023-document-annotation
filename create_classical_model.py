@@ -86,7 +86,7 @@ class Create_Model():
                     
         elif self.model_type == 'LDA':
             print('Created LDA model')
-            mdl = tp.LDAModel(k=self.num_topics)
+            mdl = tp.LDAModel(k=self.num_topics, alpha =0.05, eta=0.1)
 
         mdl.add_corpus(corpus)
 

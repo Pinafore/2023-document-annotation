@@ -32,6 +32,8 @@ class User():
         if USE_PROCESSED_TEXT:
             with open(processed_doc_dir, 'rb') as inp:
                 self.loaded_data = pickle.load(inp)
+
+            self.vectorizer_idf = vectorizer.fit_transform(self.loaded_data['datawords_nonstop'])
             # self.vectorizer_idf = 
         elif USE_TEST_DATA:
             self.test_df = pd.read_json(test_dataset_name)
