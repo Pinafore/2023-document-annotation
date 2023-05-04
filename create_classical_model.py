@@ -100,8 +100,14 @@ class Create_Model():
         # mdl.train(self.num_iters)
         self.lda_model = mdl
         assert len(corpus) == len(saved_data['texts'])
+       
 
+        # Instantiate a coherence model with the topic-word distribution, the corpus, and the dictionary
+        coherence_model = tp.coherence.Coherence(
+            corpus=mdl, coherence="c_v", top_n=10
+        )
 
+        print(coherence_model.get_score())
         '''
         Make documents for normal LDA
         '''

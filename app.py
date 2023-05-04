@@ -62,7 +62,7 @@ app = Flask(__name__)
 DATABASE = 'local_users.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
-MODES = [1, 1, 1, 1]
+# MODES = [1, 1, 1, 1]
 # MODES = [3, 3, 3, 3]
 GLOBAL_COUNTER = 0
 
