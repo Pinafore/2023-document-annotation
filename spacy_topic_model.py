@@ -3,22 +3,27 @@ import pickle
 import tomotopy as tp
 
 class TopicModel():
-    def __init__(self, model_path, model_type, dataset_dir):
+    def __init__(self, model_path, model_type, dataset_dir, num_topics):
+        print(model_path)
         with open(model_path, 'rb') as inp:
             self.loaded_data = pickle.load(inp)
 
-        self.model = tp.LLDAModel.load(model_path.replace('pkl', 'bin'))
+        if model_type == 'LDA':
+            self.model = tp.LDAModel.load(model_path.replace('pkl', 'bin'))
+        elif model_type =='SLDA':
+            self.model = tp.SLDAModel.load(model_path.replace('pkl', 'bin'))
         self.document_probas = self.loaded_data['document_probas']
         self.doc_topic_probas = self.loaded_data['doc_topic_probas']
         # self.get_document_topic_dist = self.loaded_data['get_document_topic_dist']
         self.topic_keywords = None
         self.topic_word_dist = None
         self.model_type = model_type
-        self.maked_docs = [self.model.make_doc(ele) for ele in self.data_words_nonstop]
+        self.num_topics = num_topics
 
         self.data_words_nonstop = self.loaded_data['datawords_nonstop']
         self.word_spans = self.loaded_data['spans']
         self.texts = self.loaded_data['texts']
+        self.maked_docs = [self.model.make_doc(ele) for ele in self.data_words_nonstop]
 
     def print_topics(self, verbose=False):
         mdl = self.model

@@ -45,13 +45,16 @@ class User():
                 # self.model.preprocess(5, 100)
 
                 # self.model.train(num_topics)
-                self.model = LDA_model('./Model/{}_{}.pkl'.format(model_types_map[mode], num_topics), model_types_map[mode], doc_dir)
+                self.model = TopicModel('./Model/{}_{}.pkl'.format(model_types_map[mode], num_topics), model_types_map[mode], doc_dir, num_topics)
                 self.topics = self.model.print_topics(verbose=False)
                 # print(self.topics)
 
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
+                print('Mode {}'.format(model_types_map[mode]))
+                print(self.document_probas)
+
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
             elif mode == 3:
                 self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir, doc_dir)

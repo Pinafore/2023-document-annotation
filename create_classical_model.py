@@ -110,9 +110,11 @@ class Create_Model():
             curr_doc = mdl.make_doc(doc)
             self.maked_docs.append(curr_doc)
 
+
+        # print(len(self.maked_docs))
         document_probas, doc_topic_probas = self.group_docs_to_topics()
         result = {}
-        
+        # print(document_probas)
 
         mdl.save(save_data_path.replace('pkl', 'bin'))
         result['document_probas'] = document_probas
@@ -134,23 +136,23 @@ class Create_Model():
             else:
                 inferred, _ = self.lda_model.infer(doc)
 
-        doc_topics = list(enumerate(inferred))
-        doc_prob_topic.append(inferred)
-                
+            doc_topics = list(enumerate(inferred))
+            doc_prob_topic.append(inferred)
+                    
 
-        # Infer the top three topics of the document
-        doc_topics.sort(key = lambda a: a[1], reverse= True)
-                
-        # print('doc topics {}'.format(doc_topics))
-        doc_to_topics[doc_id] = doc_topics
+            # Infer the top three topics of the document
+            doc_topics.sort(key = lambda a: a[1], reverse= True)
+                    
+            # print('doc topics {}'.format(doc_topics))
+            doc_to_topics[doc_id] = doc_topics
 
-        '''
-        doc_topics[0][0] is the topic id. doc_topics[0][1] is doc id probability.
-        '''
-        if doc_topics[0][0] in topics_probs:
-            topics_probs[doc_topics[0][0]].append((doc_id, doc_topics[0][1]))
-        else:
-            topics_probs[doc_topics[0][0]] = [(doc_id, doc_topics[0][1])]
+            '''
+            doc_topics[0][0] is the topic id. doc_topics[0][1] is doc id probability.
+            '''
+            if doc_topics[0][0] in topics_probs:
+                topics_probs[doc_topics[0][0]].append((doc_id, doc_topics[0][1]))
+            else:
+                topics_probs[doc_topics[0][0]] = [(doc_id, doc_topics[0][1])]
 
 
         '''
