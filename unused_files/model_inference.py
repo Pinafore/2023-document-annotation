@@ -14,7 +14,7 @@ parent_directory = os.path.dirname(current_directory)
 os.chdir(parent_directory)
 
 
-from spacy_topic_model import TopicModel
+from TopicModelBack.unused_files.spacy_topic_model import TopicModel
 import time
 import pandas as pd
 import argparse

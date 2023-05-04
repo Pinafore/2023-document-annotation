@@ -1,13 +1,5 @@
 import random
-from scipy.sparse import vstack
-import numpy as np
-import json
-import pandas as pd
-import os
 import pickle
-import argparse
-from alto_session import NAITM
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Neural_Model():
     def __init__(self, model_path, data_path, dataset_dir):
@@ -21,12 +13,10 @@ class Neural_Model():
         self.topic_keywords = None
         self.topic_word_dist = None
 
-        with open(data_path, 'rb') as inp:
-            saved_data = pickle.load(inp)
         
-        self.data_words_nonstop = saved_data['datawords_nonstop']
-        self.word_spans = saved_data['spans']
-        self.texts = saved_data['texts']
+        self.data_words_nonstop = self.loaded_data['datawords_nonstop']
+        self.word_spans = self.loaded_data['spans']
+        self.texts = self.loaded_data['texts']
 
     def get_topic_word_dist(self):
         topic_word_dist = self.model.get_topic_word_dist().cpu().numpy()

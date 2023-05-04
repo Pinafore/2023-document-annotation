@@ -5,6 +5,7 @@ from alto_session import NAITM
 from sklearn.feature_extraction.text import TfidfVectorizer
 from Neural_Topic_Model import Neural_Model
 
+
 doc_dir = './Data/newsgroup_sub_500.json'
 etm_doc_dir = './Data/newsgroup_sub_500.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
@@ -40,10 +41,11 @@ class User():
 
         if mode != 0:
             if mode == 1 or mode == 2:
-                self.model = TopicModel(corpus_path=doc_dir, model_type=model_types_map[mode], min_num_topics= 5, num_iters= num_iter, load_model=load_data, save_model= save_model, load_path=load_model_path.format(model_types_map[mode]), hypers = None)
-                self.model.preprocess(5, 100)
+                # self.model = TopicModel(corpus_path=doc_dir, model_type=model_types_map[mode], min_num_topics= 5, num_iters= num_iter, load_model=load_data, save_model= save_model, load_path=load_model_path.format(model_types_map[mode]), hypers = None)
+                # self.model.preprocess(5, 100)
 
-                self.model.train(num_topics)
+                # self.model.train(num_topics)
+                self.model = LDA_model('./Model/{}_{}.pkl'.format(model_types_map[mode], num_topics), model_types_map[mode], doc_dir)
                 self.topics = self.model.print_topics(verbose=False)
                 # print(self.topics)
 

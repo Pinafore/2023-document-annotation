@@ -11,12 +11,15 @@ import numpy as np
 import pandas as pd
 from pprint import pprint
 
+
+
 class Create_Model():
-    def __init__(self, num_topics, model_type, load_data_path, train_len):
+    def __init__(self, num_topics, num_iters, model_type, load_data_path, train_len):
         self.num_topics = num_topics
         self.model_type = model_type
         self.load_data_path = load_data_path
         self.train_length = train_len
+        self.num_iters = num_iters
 
     def train(self, save_data_path):
 
@@ -57,12 +60,12 @@ class Create_Model():
             for i, ngrams in enumerate(datawords_nonstop):
                 corpus.add_doc(ngrams)
         elif self.model_type == 'SLDA':
-            for i, ngrams in enumerate(self.data_words_nonstop):
+            for i, ngrams in enumerate(datawords_nonstop):
                 y = [0 for _ in range(len(label_set))]
                 null_y = [np.nan for _ in range(len(label_set))]
                         
-                if self.labels and not self.labels[i] == 'None':
-                    label = self.labels[i]
+                if labels and not labels[i] == 'None':
+                    label = labels[i]
                     y[label_dict[label]] = 1
                     corpus.add_doc(ngrams, y=y)
                     # print(y)
@@ -78,14 +81,14 @@ class Create_Model():
         elif self.model_type == 'SLDA':
             print('Created SLDA model')
             # print('Getting into SLDA...')
-            mdl = tp.SLDAModel(k=self.num_topics, vars=['b' for _ in range(len(self.label_set))], glm_param= [1.1 for i in range(len(self.label_set))], nu_sq = [5 for i in range(len(self.label_set))])
+            mdl = tp.SLDAModel(k=self.num_topics, vars=['b' for _ in range(len(label_set))], glm_param= [1.1 for i in range(len(label_set))], nu_sq = [5 for i in range(len(label_set))])
             # mdl = tp.SLDAModel(k=num_topics, vars=self.label_set)
                     
         elif self.model_type == 'LDA':
             print('Created LDA model')
             mdl = tp.LDAModel(k=self.num_topics)
 
-        mdl.add_corpus(self.corpus)
+        mdl.add_corpus(corpus)
 
         print('starting training...')
 
@@ -95,14 +98,9 @@ class Create_Model():
             mdl.train(10)
             print(f'Iteration: {i}, Log-likelihood: {mdl.ll_per_word}, Perplexity: {mdl.perplexity}')
         # mdl.train(self.num_iters)
-
+        self.lda_model = mdl
         assert len(corpus) == len(saved_data['texts'])
 
-        # coherence = mdl.topic_coherence(top_n=10, corpus=data)
-
-        # Print coherence scores for each topic
-        # for i, score in enumerate(coherence):
-        #     print(f'Topic {i}: Coherence = {score}')
 
         '''
         Make documents for normal LDA
@@ -114,10 +112,14 @@ class Create_Model():
 
         document_probas, doc_topic_probas = self.group_docs_to_topics()
         result = {}
-        result['model'] = mdl
+        
+
+        mdl.save(save_data_path.replace('pkl', 'bin'))
         result['document_probas'] = document_probas
         result['doc_topic_probas'] = doc_topic_probas
         result['spans'] = spans
+        result['datawords_nonstop'] = saved_data['datawords_nonstop']
+        result['texts'] = saved_data['texts']
         # result['get_document_topic_dist'] = doc_topic
         with open(save_data_path, 'wb+') as outp:
             pickle.dump(result, outp)
@@ -154,7 +156,7 @@ class Create_Model():
         '''
         Sort the documents by topics based on their probability in descending order
         '''
-        for k, v in self.topics_probs.items():
+        for k, v in topics_probs.items():
             topics_probs[k].sort(key = lambda a: a[1], reverse= True)
 
         return topics_probs, doc_prob_topic
@@ -164,11 +166,20 @@ def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--num_topics", help="number of topics",
                        type=int, default=20, required=False)
-    argparser.add_argument("--save_path", help="Whether we save the data",
-                       type=str, default='./Model/{}_{}', required=False)
-    
+    argparser.add_argument("--num_iters", help="number of iterations",
+                       type=int, default=1000, required=False)
+    argparser.add_argument("--model_type", help="type of the model",
+                       type=str, default='LDA', required=False)
+    argparser.add_argument("--load_data_path", help="Whether we LOAD the data",
+                       type=str, default='./Data/newsgroup_sub_500_processed.pkl', required=False)
+    argparser.add_argument("--train_len", help="number of training samples",
+                       type=int, default=500, required=False)
+
     args = argparser.parse_args()
     
+    Model = Create_Model(args.num_topics, args.num_iters, args.model_type, args.load_data_path, args.train_len)
+    save_path = './Model/{}_{}.pkl'.format(args.model_type, args.num_topics)
+    Model.train(save_path)
     
 
 if __name__ == "__main__":

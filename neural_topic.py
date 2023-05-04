@@ -111,13 +111,18 @@ def create_neural_model_and_save(num_topics, dataset):
     # print(doc_topic[1])
     document_probas,  doc_topic_probas = group_docs_to_topics(doc_topic)
 
+    # processed_data = saved_data['datawords_nonstop']
+    # spans = saved_data['spans']
     result = {}
     result['model'] = etm_instance
     result['document_probas'] = document_probas
     result['doc_topic_probas'] = doc_topic_probas
     result['spans'] = spans
     result['get_document_topic_dist'] = doc_topic
-
+    result['datawords_nonstop'] = processed_data
+    result['spans'] = spans
+    result['texts'] = saved_data['texts']
+    
     with open(save_model_path, 'wb+') as outp:
         pickle.dump(result, outp)
 
@@ -125,3 +130,5 @@ def create_neural_model_and_save(num_topics, dataset):
 file = './Data/newsgroup_sub_500_processed.pkl'
 
 create_neural_model_and_save(20, file)
+create_neural_model_and_save(21, file)
+create_neural_model_and_save(22, file)
