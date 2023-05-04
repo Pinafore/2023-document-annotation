@@ -17,6 +17,7 @@ def group_docs_to_topics(model_inferred):
         doc_topics.sort(key = lambda a: a[1], reverse= True)
 
         doc_to_topics[doc_id] = doc_topics
+        # print(doc_topics)
         if doc_topics[0][0] in topics_probs:
             topics_probs[doc_topics[0][0]].append((doc_id, doc_topics[0][1]))
         else:
@@ -32,11 +33,16 @@ def create_neural_model_and_save(num_topics, dataset):
     # corpus_file = './Data/newsgroup_sub_500.json'
     save_model_path = './Model/ETM_{}.pkl'.format(num_topics)
 
+    # with open(dataset, 'rb') as inp:
+    #     saved_data = pickle.load(inp)
+
+   
+    # processed_data = saved_data['datawords_nonstop']
+    # spans = saved_data['spans']
     with open(dataset, 'rb') as inp:
         saved_data = pickle.load(inp)
 
-   
-    processed_data = saved_data['datawords_nonstop']
+    processed_data = saved_data['texts']
     spans = saved_data['spans']
     # processed_data = processed_data[0:500]
     # Loading a dataset in JSON format. As said, documents must be composed by string sentences
@@ -77,7 +83,7 @@ def create_neural_model_and_save(num_topics, dataset):
         embeddings=embeddings_mapping, # You can pass here the path to a word2vec file or
                                     # a KeyedVectors instance
         num_topics=num_topics,
-        epochs=400,
+        epochs=600,
         debug_mode=True,
         train_embeddings=True, # Optional. If True, ETM will learn word embeddings jointly with
                                 # topic embeddings. By default, is False. If 'embeddings' argument
@@ -107,7 +113,8 @@ def create_neural_model_and_save(num_topics, dataset):
 
     doc_topic = etm_instance.get_document_topic_dist()
     doc_topic = doc_topic.cpu().numpy()
-
+    
+    print(doc_topic.shape)
     # print(doc_topic[1])
     document_probas,  doc_topic_probas = group_docs_to_topics(doc_topic)
 
@@ -127,8 +134,8 @@ def create_neural_model_and_save(num_topics, dataset):
         pickle.dump(result, outp)
 
 
-file = './Data/newsgroup_sub_500_processed.pkl'
+file = './Data/newsgroup_sub_500.pkl'
 
 create_neural_model_and_save(20, file)
-create_neural_model_and_save(21, file)
-create_neural_model_and_save(22, file)
+# create_neural_model_and_save(21, file)
+# create_neural_model_and_save(22, file)

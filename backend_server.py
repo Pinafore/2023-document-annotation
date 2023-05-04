@@ -4,10 +4,10 @@ import pandas as pd
 from alto_session import NAITM
 from sklearn.feature_extraction.text import TfidfVectorizer
 from Neural_Topic_Model import Neural_Model
-
+import pickle
 
 doc_dir = './Data/newsgroup_sub_500.json'
-etm_doc_dir = './Data/newsgroup_sub_500.pkl'
+processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
 num_iter = 1200
 load_data = True
@@ -30,7 +30,9 @@ class User():
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
         
         if USE_PROCESSED_TEXT:
-            self.vectorizer_idf = None
+            with open(processed_doc_dir, 'rb') as inp:
+                self.loaded_data = pickle.load(inp)
+            # self.vectorizer_idf = 
         elif USE_TEST_DATA:
             self.test_df = pd.read_json(test_dataset_name)
             self.vectorizer_idf = vectorizer.fit_transform(self.test_df['text'])
@@ -57,7 +59,7 @@ class User():
 
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
             elif mode == 3:
-                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), etm_doc_dir, doc_dir)
+                self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), processed_doc_dir, doc_dir)
                 self.topics = self.model.print_topics(verbose=False)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
                 self.model.get_topic_word_dist()
