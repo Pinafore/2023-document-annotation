@@ -59,7 +59,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-DATABASE = 'local_users.db'
+DATABASE = 'server_users.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]
@@ -142,6 +142,24 @@ def nist_recommend():
         conn.close()
         return jsonify({"code": 404, "msg": "User not found"})
 
+@app.route('/get_topic_list', methods=['POST'])
+def get_list():
+    user_id = request.json.get('user_id')
+
+    conn = create_connection()
+    cursor = conn.execute('SELECT mode FROM users WHERE id = ?', (user_id,))
+    row = cursor.fetchone()
+    if row:
+        # mode = row[0]
+        user =  user_instances[user_id]
+        result = user.get_document_topic_list()
+        result['code'] = 200
+        result['msg'] = 'SUCCESS'
+        conn.close()
+        return jsonify(result)
+    else:
+        conn.close()
+        return jsonify({"code": 404, "msg": "User not found"})
 
 
 # if __name__ == '__main__':

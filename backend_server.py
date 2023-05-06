@@ -19,6 +19,7 @@ test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = True
 USE_PROCESSED_TEXT = False
 training_length = 500
+REGRESSOR_PREDICT = False
 
 
 class User():
@@ -57,7 +58,7 @@ class User():
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
                 print('Mode {}'.format(model_types_map[mode]))
-                print(self.document_probas)
+                # print(self.document_probas)
 
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
             elif mode == 3:
@@ -103,7 +104,7 @@ class User():
             
             # print(result)
             print('unique user labels length is {}'.format(len(self.user_labels)))
-            if len(self.user_labels) >= 2:
+            if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
                 local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
                 return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
         
@@ -132,12 +133,23 @@ class User():
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics
             print('unique user labels length is {}'.format(len(self.user_labels)))
-            if len(self.user_labels) >= 2:
+            if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
                 local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
                 return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
         
             return -1, -1, -1, -1, result
 
-            
+    def get_document_topic_list(self):
+        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+            document_probas = self.model.document_probas
+            result = {}
+            for k, v in document_probas.items():
+                result[str(k)] = [ele[0] for ele in v]
 
+            self.doc_topic_distribution = result
+        else:
+            result = {}
+            result["1"] = len(self.df)
   
+
+        return result
