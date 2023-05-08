@@ -59,7 +59,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-DATABASE = 'server_users.db'
+DATABASE = 'local_users.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]

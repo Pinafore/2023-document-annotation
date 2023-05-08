@@ -85,7 +85,8 @@ class User():
             self.initial = False
             # print(self.topics)
             random_document, _ = self.alto.recommend_document()
-            result['raw_text'] = self.raw_texts[random_document]
+            # result['raw_text'] = self.raw_texts[random_document]
+            result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
             topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
             result['topic_order'] = topic_distibution
@@ -119,7 +120,8 @@ class User():
             self.initial = False
 
             random_document, _ = self.alto.recommend_document()
-            result['raw_text'] = self.raw_texts[random_document]
+            # result['raw_text'] = self.raw_texts[random_document]
+            result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
 
             result['prediction'] = self.alto.predict_label(int(random_document))
@@ -147,9 +149,20 @@ class User():
                 result[str(k)] = [ele[0] for ele in v]
 
             self.doc_topic_distribution = result
+
+
+            recommend_result = self.round_trip1('start', 13, "3")
+            # print(recommend_result)
+
+            result['document_id'] = recommend_result[4]['document_id']
         else:
             result = {}
-            result["1"] = len(self.df)
-  
+            result["1"] = list(range(len(self.df)))
+
+            recommend_result = self.round_trip1('start', 13, "3")
+            # print(recommend_result)
+
+            result['document_id'] = recommend_result[4]['document_id']
+
 
         return result

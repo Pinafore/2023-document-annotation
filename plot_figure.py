@@ -98,13 +98,13 @@ def read_user_accuracy_np(data_path):
 save_path = './plot_results/iter1500train_accuracy_plot_active_LDA500.png'
 
 database_name = 'local_users.db'
-database_name = 'server_users.db'
+# database_name = 'server_users.db'
 acc_type = 'global_training_acc'
 
 
 
 print_users_and_modes(database_name)
-read_all_recommendations(database_name); exit(0)
+exit(0)
 LA_session_acc = read_accuracy_db(1, database_name, acc_type)
 LDA_session_acc = read_accuracy_db(9, database_name, acc_type)
 SLDA_session_acc = read_accuracy_db(3, database_name, acc_type)

@@ -12,7 +12,7 @@ switch_doc = True
 # This variable means if you create a global classifier, then you predeciding there
 # are 20 topics in the classifier. Then test the accuracy of the global classifier
 # on both the training and the testing dataset
-global_classifier = True
+global_classifier =False
 
 
 #NATM stands for neural interactive active topic modeling
@@ -251,7 +251,8 @@ class NAITM():
             # print(type(label_num))
             # label_num = int(label_num)
             if self.is_labeled(doc_id):
-                if user_label in self.user_label_number_map:
+                # if user_label in self.user_label_number_map:
+                if user_label in self.classes:
                     # label_num = self.user_label_number_map[user_label]
                     self.user_labels[doc_id] = user_label
                     self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
