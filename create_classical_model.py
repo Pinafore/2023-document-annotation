@@ -48,7 +48,7 @@ class Create_Model():
         if self.model_type == 'LLDA':
             print('Enumerating grams...')
             for i, ngrams in enumerate(self.datawords_nonstop):
-                if self.labels and not self.labels[i] == 'None':
+                if labels and not labels[i] == 'None':
                     label = labels[i]
                     corpus.add_doc(ngrams, labels=[label])
                 else:
@@ -81,7 +81,7 @@ class Create_Model():
         elif self.model_type == 'SLDA':
             print('Created SLDA model')
             # print('Getting into SLDA...')
-            mdl = tp.SLDAModel(k=self.num_topics, vars=['b' for _ in range(len(label_set))], glm_param= [1.1 for i in range(len(label_set))], nu_sq = [5 for i in range(len(label_set))])
+            mdl = tp.SLDAModel(k=self.num_topics, vars=['b' for _ in range(len(label_set))], glm_param= [1.1 for i in range(len(label_set))], nu_sq = [5 for i in range(len(label_set))], alpha =0.05, eta=0.1)
             # mdl = tp.SLDAModel(k=num_topics, vars=self.label_set)
                     
         elif self.model_type == 'LDA':
@@ -137,10 +137,10 @@ class Create_Model():
         doc_prob_topic = []
         doc_to_topics, topics_probs = {}, {}
         for doc_id, doc in enumerate(self.maked_docs[0:self.train_length]):
-            if self.model_type == 'SLDA':
-                inferred = self.lda_model.estimate(doc)
-            else:
-                inferred, _ = self.lda_model.infer(doc)
+            # if self.model_type == 'SLDA':
+            #     inferred = self.lda_model.estimate(doc)
+            # else:
+            inferred, _ = self.lda_model.infer(doc)
 
             doc_topics = list(enumerate(inferred))
             doc_prob_topic.append(inferred)
