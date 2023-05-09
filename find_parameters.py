@@ -126,9 +126,12 @@ def objective(params, corpus, min_perplexity, max_perplexity, min_coherence, max
 
     # Since we want to minimize the objective function, we negate the coherence score
     # and add it to perplexity to get a single metric to optimize
-
-    curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations}
-    print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
+    if model_type == 'LDA':
+        curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations}
+        print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
+    elif model_type =='SLDA':
+        curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations, 'var': var_type, 'glm': glm_param, 'nu_sq': nu_sq}
+        print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
     # Normalize perplexity and coherence to [0, 1]
     normalized_perplexity = normalize(perplexity, min_perplexity, max_perplexity)
     normalized_coherence = normalize(coherence, min_coherence, max_coherence)

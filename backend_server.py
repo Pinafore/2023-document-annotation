@@ -145,10 +145,12 @@ class User():
         if self.mode == 1 or self.mode == 2 or self.mode == 3:
             document_probas = self.model.document_probas
             result = {}
+            cluster = {}
             for k, v in document_probas.items():
-                result[str(k)] = [ele[0] for ele in v]
+                cluster[str(k)] = [ele[0] for ele in v]
 
-            self.doc_topic_distribution = result
+            result['cluster'] = cluster
+            self.doc_topic_distribution = cluster
 
 
             recommend_result = self.round_trip1('start', 13, "3")
@@ -157,8 +159,9 @@ class User():
             result['document_id'] = recommend_result[4]['document_id']
         else:
             result = {}
-            result["1"] = list(range(len(self.df)))
-
+            cluster = {}
+            cluster["1"] = list(range(len(self.df)))
+            result['cluster'] = cluster
             recommend_result = self.round_trip1('start', 13, "3")
             # print(recommend_result)
 
