@@ -63,7 +63,7 @@ class Create_Model():
             for i, ngrams in enumerate(datawords_nonstop):
                 y = [0 for _ in range(len(label_set))]
                 null_y = [np.nan for _ in range(len(label_set))]
-                        
+                # y = [3 for i in range(20)]
                 if labels and not labels[i] == 'None':
                     label = labels[i]
                     y[label_dict[label]] = 1
@@ -81,7 +81,13 @@ class Create_Model():
         elif self.model_type == 'SLDA':
             print('Created SLDA model')
             # print('Getting into SLDA...')
-            mdl = tp.SLDAModel(k=self.num_topics, vars=['b' for _ in range(len(label_set))], glm_param= [1.1 for i in range(len(label_set))], nu_sq = [5 for i in range(len(label_set))], alpha =0.05, eta=0.1)
+            var_param = ['l' for _ in range(len(label_set))]
+            # var_param[5] = 'b'; var_param[7] = 'b';var_param[13] = 'b'
+            # var_param = ['l']
+            nu_sq_params = [5 for i in range(len(label_set))]
+            nu_sq_params = 5
+            mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= [1.1 for i in range(len(label_set))], nu_sq = nu_sq_params, alpha =0.05, eta=0.1)
+            # print(mdl.f)
             # mdl = tp.SLDAModel(k=num_topics, vars=self.label_set)
                     
         elif self.model_type == 'LDA':
