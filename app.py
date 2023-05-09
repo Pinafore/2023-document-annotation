@@ -161,6 +161,26 @@ def get_list():
         conn.close()
         return jsonify({"code": 404, "msg": "User not found"})
 
+@app.route('/get_document_information', methods=['POST'])
+def get_doc_info():
+    user_id = request.json.get('user_id')
+    doc_id = request.json.get('document_id')
+
+    conn = create_connection()
+    cursor = conn.execute('SELECT mode FROM users WHERE id = ?', (user_id,))
+    row = cursor.fetchone()
+    if row:
+        # mode = row[0]
+        user =  user_instances[user_id]
+        result = user.get_doc_info(doc_id)
+        result['code'] = 200
+        result['msg'] = 'SUCCESS'
+        conn.close()
+        return jsonify(result)
+    else:
+        conn.close()
+        return jsonify({"code": 404, "msg": "User not found"})
+
 
 # if __name__ == '__main__':
 #     init_db()

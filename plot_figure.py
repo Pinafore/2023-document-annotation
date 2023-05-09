@@ -98,7 +98,7 @@ def read_user_accuracy_np(data_path):
 save_path = './plot_results/iter1500train_accuracy_plot_active_LDA500.png'
 
 database_name = 'local_users.db'
-# database_name = 'server_users.db'
+database_name = 'server_users.db'
 acc_type = 'global_training_acc'
 
 

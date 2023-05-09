@@ -60,6 +60,10 @@ class TopicModel():
         for i in range(self.num_topics):
             topic_dist[i] = self.model.get_topic_word_dist(i)
         
+        # print(vocabs[0])
+        # print(vocabs[-1])
+        print(len(topic_dist[0]))
+        print(len(vocabs))
         word_topic_distribution = dict()
         for i, word in enumerate(vocabs):
             word_topic_distribution[word] = [v[i] for k, v in topic_dist.items()]
