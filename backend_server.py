@@ -76,6 +76,8 @@ class User():
 
     def get_doc_information(self, doc_id):
         result = dict()
+        print('getting document information...')
+        print('mode is ', self.mode)
         if self.mode == 1 or self.mode == 2 or self.mode == 3:
             # result['raw_text'] = self.raw_texts[random_document]
             topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
@@ -102,7 +104,7 @@ class User():
             #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
         
             return result
-        elif self.mode ==1:
+        elif self.mode ==0:
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
             #     result['prediction'] = "Create at least two labels to start active learning"

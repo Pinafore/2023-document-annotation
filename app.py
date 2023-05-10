@@ -164,6 +164,7 @@ def get_list():
 
 @app.route('/get_document_information', methods=['POST'])
 def get_doc_info():
+    print('fetching document information')
     user_id = request.json.get('user_id')
     doc_id = request.json.get('document_id')
 
@@ -174,7 +175,7 @@ def get_doc_info():
         # mode = row[0]
         user =  user_instances[user_id]
         result = user.get_doc_information(doc_id)
-        print(result)
+        # print(result)
         result['code'] = 200
         result['msg'] = 'SUCCESS'
         conn.close()
