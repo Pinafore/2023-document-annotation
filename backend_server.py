@@ -116,7 +116,8 @@ class User():
             # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
             #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
             #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-        
+            print('result is ...')
+            print(result)
             return result
 
 
