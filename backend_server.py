@@ -216,6 +216,7 @@ class User():
             cluster["1"] = list(range(len(self.df)))
             result['cluster'] = cluster
             recommend_result = self.round_trip1('start', 13, "3")
+            print('recommend document')
             print(recommend_result)
 
             result['document_id'] = recommend_result[4]['document_id']
