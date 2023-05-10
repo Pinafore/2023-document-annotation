@@ -74,7 +74,7 @@ class User():
         else:
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df)
 
-    def get_doc_info(self, doc_id):
+    def get_doc_information(self, doc_id):
         result = dict()
         if self.mode == 1 or self.mode == 2 or self.mode == 3:
             # result['raw_text'] = self.raw_texts[random_document]
@@ -216,14 +216,14 @@ class User():
             cluster["1"] = list(range(len(self.df)))
             result['cluster'] = cluster
             recommend_result = self.round_trip1('start', 13, "3")
-            print('recommend document')
-            print(recommend_result)
+            # print('recommend document')
+            # print(recommend_result)
 
             result['document_id'] = recommend_result[4]['document_id']
             result['keywords'] = {}
             # random_document, _ = self.alto.recommend_document()
             # result['document_id'] = random_document
-            print('result')
-            print(result)
+            # print('result')
+            # print(result)
 
         return result

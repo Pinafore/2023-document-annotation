@@ -173,7 +173,7 @@ def get_doc_info():
     if row:
         # mode = row[0]
         user =  user_instances[user_id]
-        result = user.get_doc_info(doc_id)
+        result = user.get_doc_information(doc_id)
         print(result)
         result['code'] = 200
         result['msg'] = 'SUCCESS'
