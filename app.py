@@ -97,6 +97,7 @@ def hello():
 
 @app.route('/create_user', methods=['POST'])
 def create_user():
+    print('creating user')
     global GLOBAL_COUNTER
     mode_idx = GLOBAL_COUNTER%4
     mode = MODES[mode_idx]
@@ -173,6 +174,7 @@ def get_doc_info():
         # mode = row[0]
         user =  user_instances[user_id]
         result = user.get_doc_info(doc_id)
+        print(result)
         result['code'] = 200
         result['msg'] = 'SUCCESS'
         conn.close()
