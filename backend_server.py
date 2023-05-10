@@ -19,7 +19,7 @@ test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = True
 USE_PROCESSED_TEXT = False
 training_length = 500
-REGRESSOR_PREDICT = False
+REGRESSOR_PREDICT = True
 
 
 class User():

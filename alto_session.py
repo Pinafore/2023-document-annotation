@@ -12,7 +12,7 @@ switch_doc = True
 # This variable means if you create a global classifier, then you predeciding there
 # are 20 topics in the classifier. Then test the accuracy of the global classifier
 # on both the training and the testing dataset
-global_classifier =False
+global_classifier =True
 
 
 #NATM stands for neural interactive active topic modeling
