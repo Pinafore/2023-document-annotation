@@ -223,6 +223,7 @@ class User():
             result['keywords'] = {}
             # random_document, _ = self.alto.recommend_document()
             # result['document_id'] = random_document
-
+            print('result')
+            print(result)
 
         return result
