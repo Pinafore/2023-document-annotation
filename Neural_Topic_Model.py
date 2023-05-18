@@ -1,5 +1,6 @@
 import random
 import pickle
+import numpy as np
 
 class Neural_Model():
     def __init__(self, model_path, data_path, dataset_dir):
@@ -31,9 +32,11 @@ class Neural_Model():
     def print_topics(self, verbose=False):
         output_topics = {}
 
-        topics = self.model.get_topics(10)
+        topics = self.model.get_topics(20)
         for i, ele in enumerate(topics):
             output_topics[i] = ele
+            if verbose:
+                print(ele)
 
         self.topic_keywords = output_topics
         return output_topics
@@ -105,5 +108,20 @@ class Neural_Model():
                     result[str(topic)]['spans'].append([])
 
                 result[str(topic)]['keywords'] = keywords
+
+        return result
+
+    def concatenate_keywords(self, topic_keywords, datawords):
+        result = []
+        for i, doc in enumerate(self.data_words_nonstop):
+            if i < len(self.data_words_nonstop):
+                topic_idx = np.argmax(self.doc_topic_probas[i])
+                keywords = topic_keywords[topic_idx]
+                curr_ele = doc + keywords
+                res_ele = ' '.join(curr_ele)
+                result.append(res_ele)
+            else:
+                res_ele = ' '.join(doc)
+                result.append(res_ele)
 
         return result

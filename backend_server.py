@@ -16,10 +16,10 @@ load_model_path = './Model/{}_model_data.pkl'
 num_topics = 20
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
-USE_TEST_DATA = True
+USE_TEST_DATA = False
 USE_PROCESSED_TEXT = False
 training_length = 500
-REGRESSOR_PREDICT = True
+REGRESSOR_PREDICT = False
 
 
 class User():
@@ -30,17 +30,22 @@ class User():
         self.test_df = None
         vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
         
-        if USE_PROCESSED_TEXT:
-            with open(processed_doc_dir, 'rb') as inp:
-                self.loaded_data = pickle.load(inp)
-
-            self.vectorizer_idf = vectorizer.fit_transform(self.loaded_data['datawords_nonstop'])
-            # self.vectorizer_idf = 
-        elif USE_TEST_DATA:
+        
+        # self.vectorizer_idf = 
+        if USE_TEST_DATA and not USE_PROCESSED_TEXT:
             self.test_df = pd.read_json(test_dataset_name)
             self.vectorizer_idf = vectorizer.fit_transform(self.test_df['text'])
-        else:
+        elif not USE_PROCESSED_TEXT:
             self.vectorizer_idf = vectorizer.fit_transform(self.df.text.values.tolist())
+
+        if USE_PROCESSED_TEXT:
+            res_dataset_name = test_dataset_name.replace('.json', '_processed.json')
+            self.test_df = pd.read_json(res_dataset_name)
+            pickle_test = res_dataset_name.replace('json', 'pkl')
+            with open(pickle_test, 'rb') as inp:
+                loaded_test_data = pickle.load(inp)
+                self.processed_test_data = loaded_test_data['datawords_nonstop']
+
         self.initial = True
         self.user_labels = set()
 
@@ -52,10 +57,15 @@ class User():
                 # self.model.train(num_topics)
                 self.model = TopicModel('./Model/{}_{}.pkl'.format(model_types_map[mode], num_topics), model_types_map[mode], doc_dir, num_topics)
                 self.topics = self.model.print_topics(verbose=False)
+                if USE_PROCESSED_TEXT:
+                    self.vectorizer_idf = vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
+
                 self.string_topics = {str(k): v for k, v in self.topics.items()}
                 # print(self.string_topics)
-
+            
                 self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
+
+
                 self.word_topic_distributions = self.model.get_word_topic_distribution()
                 
                 print('Mode {}'.format(model_types_map[mode]))
@@ -65,6 +75,10 @@ class User():
             elif mode == 3:
                 self.model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), processed_doc_dir, doc_dir)
                 self.topics = self.model.print_topics(verbose=False)
+
+                if USE_PROCESSED_TEXT:
+                    self.vectorizer_idf = vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
+
                 self.string_topics = {str(k): v for k, v in self.topics.items()}
                 # print(self.string_topics)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
@@ -72,6 +86,15 @@ class User():
 
                 self.alto = NAITM(self.raw_texts, self.document_probas,  self.doc_topic_probas, self.df, inference_alg, self.vectorizer_idf, training_length, 1, self.test_df)
         else:
+            if USE_PROCESSED_TEXT:
+                with open(processed_doc_dir, 'rb') as inp:
+                    self.loaded_data = pickle.load(inp)
+
+                datawords_nonstop = self.loaded_data['datawords_nonstop']
+                data_to_transform = [' '.join(doc) for doc in datawords_nonstop]
+                self.vectorizer_idf = vectorizer.fit_transform(data_to_transform)
+
+              
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df)
 
     def get_doc_information(self, doc_id):

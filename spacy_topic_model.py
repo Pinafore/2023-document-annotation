@@ -1,6 +1,7 @@
 import random
 import pickle
 import tomotopy as tp
+import numpy as np
 
 class TopicModel():
     def __init__(self, model_path, model_type, dataset_dir, num_topics):
@@ -54,7 +55,8 @@ class TopicModel():
         }
         '''
 
-        vocabs = self.model.vocabs
+        # vocabs = self.model.vocabs
+        vocabs = self.model.used_vocabs
         topic_dist = dict()
 
         for i in range(self.num_topics):
@@ -64,6 +66,7 @@ class TopicModel():
         # print(vocabs[-1])
         print(len(topic_dist[0]))
         print(len(vocabs))
+        print(len(self.model.used_vocabs))
         word_topic_distribution = dict()
         for i, word in enumerate(vocabs):
             word_topic_distribution[word] = [v[i] for k, v in topic_dist.items()]
@@ -123,10 +126,29 @@ class TopicModel():
             for ele in topic_res_num:
                 topic = ele[0]
                 keywords = ele[1]
-                if self.word_topic_distribution[word][topic] >= threthold:
+
+                '''
+                This part (word in self.word_topic_distribution) might filter out a lot of the vocabularies
+                '''
+                if word in self.word_topic_distribution and self.word_topic_distribution[word][topic] >= threthold:
                     if len(doc_span[i])>0 and doc_span[i][0] <= len(self.texts[doc_id]) and doc_span[i][1] <= len(self.texts[doc_id]):
                         result[str(topic)]['spans'].append([doc_span[i][0], doc_span[i][1]])
                     # result[str(topic)]['score'].append(str(self.word_topic_distribution[word][topic]))
                 result[str(topic)]['keywords'] = keywords
 
+        return result
+
+    def concatenate_keywords(self, topic_keywords, datawords):
+        result = []
+        for i, doc in enumerate(datawords):
+            if i < len(self.data_words_nonstop):
+                topic_idx = np.argmax(self.doc_topic_probas[i])
+                keywords = topic_keywords[topic_idx]
+                curr_ele = doc + keywords
+                res_ele = ' '.join(curr_ele)
+                result.append(res_ele)
+            else:
+                res_ele = ' '.join(doc)
+                result.append(res_ele)
+                
         return result

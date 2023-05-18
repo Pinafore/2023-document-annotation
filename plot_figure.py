@@ -94,43 +94,85 @@ def read_user_accuracy_np(data_path):
     return array
 
 
-# print_users_and_modes('local_users.db')
-save_path = './plot_results/iter1500train_accuracy_plot_active_LDA500.png'
+def plot_comparison(id1, id2, db_name, acc_type, id1_name, id2_name, save_path):
+    session1_acc = read_accuracy_db(id1, db_name, acc_type)
+    session2_acc = read_accuracy_db(id2, db_name, acc_type)
+    print(session1_acc[0:20])
+    print(session2_acc[0:20])
+    start_index = 0
 
-database_name = 'local_users.db'
-# database_name = 'server_users.db'
-acc_type = 'global_training_acc'
+    for i in range(len(session1_acc)):
+        if session1_acc[i] < 0 and i > start_index:
+            start_index = i
+    
+    for j in range(len(session2_acc)):
+        if session2_acc[j] < 0 and j > start_index:
+            start_index = j 
 
-
-
-print_users_and_modes(database_name)
-exit(0)
-LA_session_acc = read_accuracy_db(1, database_name, acc_type)
-LDA_session_acc = read_accuracy_db(9, database_name, acc_type)
-SLDA_session_acc = read_accuracy_db(3, database_name, acc_type)
-ETM_session_acc = read_accuracy_db(4, database_name, acc_type)
-logistic_acc = read_user_accuracy_np('./np_files/classifier_results.npy')
-
-
-# min_len = min(len(logistic_acc[0]), len(logistic_acc[1]), len(logistic_acc[2]), len(logistic_acc[3]), len(LA_session_acc), len(LDA_session_acc))
-LDA_session_acc[2] = 0.05
-LDA_session_acc[3] = 0.05
-print(LDA_session_acc[0:20])
-
-# data_to_plot = {
-#                 'number documents labeled': [i+1 for i in range(min_len)] * 5,
-
-#                 'training acc': LA_session_acc[2:] + logistic_acc[2].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
-#                 'model': ['LA session'] * min_len + ['ordered acc'] * min_len + ['LDA session'] * min_len + ['SLDA session'] * min_len + ['ETM session'] * min_len
-#                 }
-
-min_len = min(len(LA_session_acc[2:]), len(LDA_session_acc))
-data_to_plot = {    
-                'number documents labeled': [i+3 for i in range(min_len)] * 2,
-                'training acc': LA_session_acc[2:]+ LDA_session_acc[2:],
-                'model': ['active fitting'] * min_len + ['LDA fitting'] * min_len
+    print(start_index)
+    start_index += 1
+    min_len = len(session1_acc) -start_index
+    data_to_plot = {    
+                'number documents labeled': [i+1+start_index for i in range(min_len)] * 2,
+                'training acc': session1_acc[start_index:]+ session2_acc[start_index:],
+                'model': [id1_name] * min_len + [id2_name] * min_len
 
                 }
 
-plot(save_path, data_to_plot)
+    plot(save_path, data_to_plot)
+
+
+
+database_name = 'local_users.db'
+database_name = 'server_users.db'
+acc_type = 'global_training_acc'
+
+print_users_and_modes(database_name)
+# read_all_recommendations(database_name)
+exit(0)
+plot_comparison(55, 62, database_name, acc_type, 'hand SLDA','opt SLDA', './plot_results/hand_SLDA_vs_opt_min_cf_SLDA.png')
+
+
+
+
+'''
+Original      Concat          min_cf       hand_pick_hyperparam        opt+min_cf
+1: LA         31: LA         
+2: LDA        32: LDA        
+3: SLDA       33: SLDA       62: SLDA      55: SLDA                     72: SLDA
+4: ETM        34: ETM        
+'''
+
+# # exit(0)
+# LA_session_acc = read_accuracy_db(31, database_name, acc_type)
+# LDA_session_acc = read_accuracy_db(32, database_name, acc_type)
+# SLDA_session_acc = read_accuracy_db(33, database_name, acc_type)
+
+# ETM_session_acc = read_accuracy_db(4, database_name, acc_type)
+# concate_ETM_session_acc = read_accuracy_db(34, database_name, acc_type)
+# logistic_acc = read_user_accuracy_np('./np_files/classifier_results.npy')
+
+
+# # min_len = min(len(logistic_acc[0]), len(logistic_acc[1]), len(logistic_acc[2]), len(logistic_acc[3]), len(LA_session_acc), len(LDA_session_acc))
+# # LDA_session_acc[2] = 0.05
+# # LDA_session_acc[3] = 0.05
+# print(ETM_session_acc[20:30])
+# print(LA_session_acc[20:30])
+# # data_to_plot = {
+# #                 'number documents labeled': [i+1 for i in range(min_len)] * 5,
+
+# #                 'training acc': LA_session_acc[2:] + logistic_acc[2].tolist() + LDA_session_acc[2:] + SLDA_session_acc[2:] + ETM_session_acc[2:],
+# #                 'model': ['LA session'] * min_len + ['ordered acc'] * min_len + ['LDA session'] * min_len + ['SLDA session'] * min_len + ['ETM session'] * min_len
+# #                 }
+
+# min_len = min(len(LA_session_acc[2:]), len(ETM_session_acc))
+# data_to_plot = {    
+#                 'number documents labeled': [i+3 for i in range(min_len)] * 2,
+#                 'training acc': concate_ETM_session_acc[2:]+ ETM_session_acc[2:],
+#                 'model': ['concat ETM'] * min_len + ['ETM fitting'] * min_len
+
+#                 }
+
+# save_path = './plot_results/EMT0_vs_ETM_optimize.png'
+# plot(save_path, data_to_plot)
 # print(logistic_acc[2])

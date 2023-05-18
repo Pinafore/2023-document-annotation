@@ -83,7 +83,7 @@ def create_neural_model_and_save(num_topics, dataset):
         embeddings=embeddings_mapping, # You can pass here the path to a word2vec file or
                                     # a KeyedVectors instance
         num_topics=num_topics,
-        epochs=1500,
+        epochs=1800,
         debug_mode=True,
         train_embeddings=True, # Optional. If True, ETM will learn word embeddings jointly with
                                 # topic embeddings. By default, is False. If 'embeddings' argument
@@ -109,12 +109,13 @@ def create_neural_model_and_save(num_topics, dataset):
         print('-'*20)
         print()
 
-    print(topic_dist.shape)
+    # print(topic_dist.shape)
+    print('coherence: ', topic_coherence)
 
     doc_topic = etm_instance.get_document_topic_dist()
     doc_topic = doc_topic.cpu().numpy()
     
-    print(doc_topic.shape)
+    # print(doc_topic.shape)
     # print(doc_topic[1])
     document_probas,  doc_topic_probas = group_docs_to_topics(doc_topic)
 

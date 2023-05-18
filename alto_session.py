@@ -12,7 +12,9 @@ switch_doc = True
 # This variable means if you create a global classifier, then you predeciding there
 # are 20 topics in the classifier. Then test the accuracy of the global classifier
 # on both the training and the testing dataset
-global_classifier =True
+global_classifier = False
+global_testing = False
+use_min = False
 
 
 #NATM stands for neural interactive active topic modeling
@@ -57,8 +59,9 @@ class NAITM():
             unique_labels = np.unique(df.label.values.tolist())
             self.global_classifier = self.initialize_classifier(running_type)
             self.global_classes = unique_labels
-            self.test_texts = text_vectorizer[train_len:train_len+100]
-            self.test_labels = test_dataset_frame.label.values.tolist()[train_len:train_len+100]
+            if global_testing:
+                self.test_texts = text_vectorizer[train_len:train_len+100]
+                self.test_labels = test_dataset_frame.label.values.tolist()[train_len:train_len+100]
             
 
         # Stores and track labeled documents and labels
@@ -90,7 +93,7 @@ class NAITM():
         classifier_type = classifier_type.lower()
 
         if classifier_type == 'logreg':
-            return SGDClassifier(loss="log", penalty="l2", max_iter=1000, tol=1e-3, random_state=42, learning_rate="adaptive", eta0=0.1, validation_fraction=0.2)
+            return SGDClassifier(loss="log_loss", penalty="l2", max_iter=1000, tol=1e-3, random_state=42, learning_rate="adaptive", eta0=0.1, validation_fraction=0.2)
         elif classifier_type == 'logreg_modal':
             print('Implement other types')
             return None
@@ -164,26 +167,35 @@ class NAITM():
                 print(self.recommended_doc_ids)
                 return self.doc_probs[max_topic_idx][0][0], -1
             else:
-                max_idx = np.argmax(self.scores)
+                if use_min:
+                    chosen_idx = np.argmin(self.scores)
+                else:
+                    chosen_idx = np.argmax(self.scores)
 
                 '''
                 Don't show the users an already shown document
                 '''
 
                 # print('length of recommended id is {}'.format(len(self.recommended_doc_ids)))
-                while max_idx in self.recommended_doc_ids:
-                    self.scores[max_idx] = -1
+                while chosen_idx in self.recommended_doc_ids:
+                    if use_min:
+                        self.scores[chosen_idx] = float('inf')
+                    else:
+                        self.scores[chosen_idx] = -1
                     try:
-                        max_idx = np.argmax(self.scores)
+                        if use_min:
+                            chosen_idx = np.argmin(self.scores)
+                        else:
+                            chosen_idx = np.argmax(self.scores)
                     except:
                         print('current len of the score list is {}'.format(len(self.scores)))
                         return None
                 
 
                 print('Classifier in progess...')
-                print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[max_idx]))
-                self.recommended_doc_ids.add(max_idx)
-                return max_idx, self.scores[max_idx]
+                print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[chosen_idx]))
+                self.recommended_doc_ids.add(chosen_idx)
+                return chosen_idx, self.scores[chosen_idx]
         else:
             if len(self.classes) < 2:
                 print('-----------')
@@ -199,24 +211,34 @@ class NAITM():
                 # print('-----------')
                 # return 
                 # return random.randint(0, len(self.median_pro)-1)
-                max_idx = np.argmax(self.scores)
+                if use_min:
+                    chosen_idx = np.argmin(self.scores)
+                else:
+                    chosen_idx = np.argmax(self.scores)
+                
 
                 '''
                 Don't show the users an already shown document
                 '''
-                while max_idx in self.recommended_doc_ids:
+                while chosen_idx in self.recommended_doc_ids:
                     # self.scores = np.delete(self.scores, max_idx)
-                    self.scores[max_idx] = -1
+                    if use_min:
+                        self.scores[chosen_idx] = float('inf')
+                    else:
+                        self.scores[chosen_idx] = -1
                     try:
-                        max_idx = np.argmax(self.scores)
+                        if use_min:
+                            chosen_idx = np.argmin(self.scores)
+                        else:
+                            chosen_idx = np.argmax(self.scores)
                     except:
                         print('current len of the score list is {}'.format(len(self.scores)))
                 
 
                 print('Classifier in progess...')
-                print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[max_idx]))
-                self.recommended_doc_ids.add(max_idx)
-                return max_idx, self.scores[max_idx]
+                print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[chosen_idx]))
+                self.recommended_doc_ids.add(chosen_idx)
+                return chosen_idx, self.scores[chosen_idx]
 
             
     def recommend_document(self):
@@ -364,7 +386,8 @@ class NAITM():
     def eval_classifier(self):
         local_training_preds = self.classifier.predict(self.documents_track)
         local_training_acc = accuracy_score(self.labels_track, local_training_preds)
-        if len(self.classes) >= 20 and global_classifier:
+        local_testing_acc = -1
+        if len(self.classes) >= 20 and global_classifier and global_testing:
             local_testing_preds = self.classifier.predict(self.test_texts)
             local_testing_acc = accuracy_score(self.test_labels, local_testing_preds)
 
@@ -375,11 +398,15 @@ class NAITM():
         if global_classifier:
             global_training_preds = self.global_classifier.predict(self.text_vectorizer[0:self.train_length])
             global_training_acc = accuracy_score(self.df.label.values.tolist()[0:self.train_length], global_training_preds)
-            global_testing_preds = self.classifier.predict(self.test_texts)
-            global_testing_acc = accuracy_score(self.test_labels, global_testing_preds)
+            
+            global_testing_acc = -1
+            if global_testing:
+                global_testing_preds = self.classifier.predict(self.test_texts)
+                global_testing_acc = accuracy_score(self.test_labels, global_testing_preds)
+                print('global testing accuracy score is {}'.format(global_testing_acc))
 
             print('global training accuracy score is {}'.format(global_training_acc))
-            print('global testing accuracy score is {}'.format(global_testing_acc))
+            
         else:
             global_training_acc = -1
             global_testing_acc = -1

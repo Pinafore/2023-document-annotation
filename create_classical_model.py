@@ -84,18 +84,21 @@ class Create_Model():
             # 'min_cf': 2, 'min_df': 4, 'iterations': 145, 'var': 'l', 'glm_param': 5.252727047556928, 
             # 'nu_sq': 6.7920065058884145}
 
-            # nu_sq_params = 5
-            # glm_param = [1.1 for i in range(len(label_set))]
+            nu_sq = [5 for i in range(len(label_set))]
+            glm_param = [1.1 for i in range(len(label_set))]
             alpha = 0.43141738585649325
             eta = 0.9614396430577419
-            min_cf = 2; min_df = 4; self.num_iters = 1450
+            min_cf = 2; min_df = 4; self.num_iters = 2500
             var_param = ['l' for _ in range(len(label_set))]
-            glm_param = 5.252727047556928; nu_sq = 6.7920065058884145
+            # glm_param = [5.252727047556928 for _ in range(len(label_set))] 
+            # nu_sq = [6.7920065058884145 for _ in range(len(label_set))]
+            # glm_param = 5.252727047556928
+            # nu_sq = 6.7920065058884145
 
             # mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= glm_param, nu_sq = nu_sq, alpha =alpha, eta=eta, min_cf=min_cf, min_df=min_df)
-            mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= glm_param, nu_sq = nu_sq, alpha =alpha, eta=eta)
+            # mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= glm_param, nu_sq = nu_sq, alpha =alpha, eta=eta)
             # print(mdl.f)
-            # mdl = tp.SLDAModel(k=num_topics, vars=self.label_set)
+            mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, nu_sq=nu_sq,glm_param=glm_param)
                     
         elif self.model_type == 'LDA':
             print('Created LDA model')

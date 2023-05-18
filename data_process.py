@@ -20,7 +20,7 @@ class Preprocessing():
 
         nlp = spacy.load('en_core_web_sm')
         # nlp.add_pipe('sentencizer')
-        nlp.add_pipe(nlp.create_pipe('sentencizer'))
+        nlp.add_pipe('sentencizer')
                                 
         docs = [nlp(x) for x in data]
 
@@ -75,6 +75,17 @@ class Preprocessing():
          with open('./Data/{}.pkl'.format(save_path), 'wb+') as outp:
                     pickle.dump(result, outp)
 
+    def convert_clean_data_to_json(self, save_path):
+        processed_test_data = [' '.join(doc) for doc in self.data_words_nonstop]
+        result = []
+        for i in range(len(processed_test_data)):
+            curr = {'texts': processed_test_data[i], 'label': self.labels[i]}
+            result.append(curr)
+
+        df = pd.DataFrame(result)
+
+        df.to_json(save_path, orient='records', lines=False)
+
 def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--doc_dir", help="Where we read the source documents",
@@ -84,6 +95,7 @@ def main():
     
     args = argparser.parse_args()
     process_obj = Preprocessing(args.doc_dir)
+    process_obj.convert_clean_data_to_json('./Data/processed_newsgroup_sub_1000.json')
     process_obj.save_data(args.save_path)
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template, url_for, redirect, flash, session, jsonify
 from backend_server import User
 import random
 import sqlite3
@@ -6,14 +6,17 @@ import sqlite3
 
 
 
-
 app = Flask(__name__)
 
 DATABASE = 'local_users.db'
+DATABASE = 'server_users.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]
+# MODES = [2, 2, 2, 2]
 # MODES = [3, 3, 3, 3]
+# MODES = [0, 3, 3, 3]
+# MODES = [0, 0, 0, 0]
 GLOBAL_COUNTER = 0
 
 def create_connection():
@@ -47,7 +50,6 @@ def hello():
 
 @app.route('/create_user', methods=['POST'])
 def create_user():
-    print('creating user')
     global GLOBAL_COUNTER
     mode_idx = GLOBAL_COUNTER%4
     mode = MODES[mode_idx]
@@ -60,6 +62,8 @@ def create_user():
         result = cursor.fetchone()
         user_id = result[0]
         user_instances[user_id] = User(mode)  # Create the User() object and store it in the user_instances dictionary
+    
+    print('creating user ', user_id)
     return {'user_id': user_id, 'code': 200, 'msg': 'User created'}
 
 @app.route('/recommend_document', methods=['POST'])
@@ -129,12 +133,24 @@ def get_doc_info():
         result['code'] = 200
         result['msg'] = 'SUCCESS'
         conn.close()
+        # print('SUCCESS')
         return jsonify(result)
     else:
         conn.close()
         return jsonify({"code": 404, "msg": "User not found"})
 
 
-# if __name__ == '__main__':
-#     init_db()
-#     app.run(host='0.0.0.0', port=3000)
+
+'''
+This is frontend session
+'''
+# all_texts = json.load(open("newsgroup_sub_500.json"))
+# os.urandom(24).hex()
+
+# topic_list = json.load(open('topic_list.json'))
+# all_texts = json.load(open("newsgroup_sub_500.json"))
+# url = 'https://nist-topic-model.umiacs.umd.edu'
+# app.config['SECRET_KEY'] = os.urandom(24).hex()
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+
