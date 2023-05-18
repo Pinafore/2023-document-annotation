@@ -62,11 +62,12 @@ class Preprocessing():
                         temp_span.append((token.idx, token.idx + len(token)))
                 self.data_words_nonstop.append(temp_doc)
                 self.word_spans.append(temp_span)
-
+        
         self.labels = df.label.values.tolist()
         
     def save_data(self, save_path):
          print('saving data...')
+         print(self.data_words_nonstop[0])
          result = {}
          result['datawords_nonstop'] = self.data_words_nonstop
          result['spans'] = self.word_spans
@@ -95,7 +96,7 @@ def main():
     
     args = argparser.parse_args()
     process_obj = Preprocessing(args.doc_dir)
-    process_obj.convert_clean_data_to_json('./Data/processed_newsgroup_sub_1000.json')
+    process_obj.convert_clean_data_to_json('./Data/processed_nist_all_labeled_1000.json')
     process_obj.save_data(args.save_path)
 
 if __name__ == "__main__":

@@ -6,14 +6,17 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from Neural_Topic_Model import Neural_Model
 import pickle
 
-doc_dir = './Data/newsgroup_sub_500.json'
-processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
+# doc_dir = './Data/newsgroup_sub_500.json'
+# processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
+doc_dir = './Data/Nist_all_labeled.json'
+processed_doc_dir = './Data/nist_all_labeled.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
 num_iter = 1200
 load_data = True
 save_model = False
 load_model_path = './Model/{}_model_data.pkl'
-num_topics = 20
+# num_topics = 20
+num_topics = 13
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = False

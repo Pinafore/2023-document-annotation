@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 DATABASE = 'local_users.db'
 DATABASE = 'server_users.db'
+DATABASE = 'beta_testing.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]

@@ -1,7 +1,0 @@
- * Debug mode: off
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:5001
- * Running on http://192.168.74.24:5001
-[33mPress CTRL+C to quit[0m
-192.168.7.236 - - [18/May/2023 10:51:01] "GET / HTTP/1.1" 200 -

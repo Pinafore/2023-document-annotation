@@ -1,0 +1,55 @@
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:6000
+ * Running on http://192.168.74.24:6000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/May/2023 16:28:19] "POST /create_user HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:21] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:21] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:29] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:34] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:34] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:34] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:38] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:38] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:38] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:45] "POST /create_user HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:47] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:47] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:28:51] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:29:43] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:29:43] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:29:43] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:29:43] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:15] "POST /create_user HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:18] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:18] "POST /get_topic_list HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:19] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:23] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:23] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:23] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:23] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:26] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:26] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:26] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:29] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:29] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:29] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:29] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:32] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:32] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:32] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:32] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:37] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:37] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:37] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:37] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:39] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:39] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:39] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:39] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:43] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:44] "POST /recommend_document HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:44] "POST /get_document_information HTTP/1.1" 200 -
+127.0.0.1 - - [18/May/2023 16:30:44] "POST /get_document_information HTTP/1.1" 200 -

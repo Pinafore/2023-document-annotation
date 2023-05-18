@@ -42,7 +42,9 @@ def create_neural_model_and_save(num_topics, dataset):
     with open(dataset, 'rb') as inp:
         saved_data = pickle.load(inp)
 
-    processed_data = saved_data['texts']
+    processed_data = saved_data['datawords_nonstop']
+
+    # print(processed_data[0])
     spans = saved_data['spans']
     # processed_data = processed_data[0:500]
     # Loading a dataset in JSON format. As said, documents must be composed by string sentences
@@ -55,6 +57,8 @@ def create_neural_model_and_save(num_topics, dataset):
     
     documents = [' '.join(doc) for doc in processed_data]
 
+    # print(documents)
+    # exit(0)
     # Preprocessing the dataset
     vocabulary, train_dataset, test_dataset, = preprocessing.create_etm_datasets(
         documents, 
@@ -83,7 +87,7 @@ def create_neural_model_and_save(num_topics, dataset):
         embeddings=embeddings_mapping, # You can pass here the path to a word2vec file or
                                     # a KeyedVectors instance
         num_topics=num_topics,
-        epochs=1800,
+        epochs=2000,
         debug_mode=True,
         train_embeddings=True, # Optional. If True, ETM will learn word embeddings jointly with
                                 # topic embeddings. By default, is False. If 'embeddings' argument
@@ -135,8 +139,9 @@ def create_neural_model_and_save(num_topics, dataset):
         pickle.dump(result, outp)
 
 
-file = './Data/newsgroup_sub_500.pkl'
+file = './Data/newsgroup_sub_500_processed.pkl'
+file = './Data/nist_all_labeled.pkl'
 
-create_neural_model_and_save(20, file)
+create_neural_model_and_save(13, file)
 # create_neural_model_and_save(21, file)
 # create_neural_model_and_save(22, file)
