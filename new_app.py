@@ -4,7 +4,7 @@ from backend_server import User
 import random
 import sqlite3
 import os
-
+from community_resilience.tools import *
 
 
 app = Flask(__name__)
@@ -146,6 +146,7 @@ This is frontend session
 '''
 
 init_db()
+all_texts = './Data/Nist_all_labeled.json'
 
 app.config['SECRET_KEY'] = os.urandom(24).hex()
 app.config["SESSION_PERMANENT"] = False
@@ -244,3 +245,28 @@ def active_list(name):
         return redirect(url_for("finish"))
  
     return render_template("active_list.html", results=results, name=name, rec = rec)
+
+@app.route("//non_active_list//<name>", methods=["POST", "GET"])
+def non_active_list(name):
+    # if session.get("name") != name:
+    #     # if not there in the session then redirect to the login page
+    #     return redirect("/login")
+
+    topics = get_list(session['user_id'])
+
+    recommended = int(topics["document_id"])
+
+    results = get_texts(topic_list=topics, all_texts=all_texts)
+
+
+    # This part can be directly used from my functions
+    sliced_results = get_sliced_texts(topic_list=topics, all_texts=all_texts)
+    # print(sliced_results)
+
+    keywords = topics["keywords"] 
+    # print(keywords)
+
+    if request.method =="POST":
+        return redirect(url_for("finish"))
+
+    return render_template("nonactive.html",sliced_results=sliced_results, results=results, name=name, keywords=keywords, recommended=recommended, document_list = topics["cluster"])
