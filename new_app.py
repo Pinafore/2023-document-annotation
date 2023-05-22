@@ -5,7 +5,8 @@ import random
 import sqlite3
 import os
 from community_resilience.tools import *
-
+import time
+import json
 
 app = Flask(__name__)
 
@@ -67,13 +68,7 @@ def create_user(user_name):
     return {'user_id': user_id, 'code': 200, 'msg': 'User created'}
 
 # @app.route('/recommend_document', methods=['POST'])
-def nist_recommend():
-    user_id = request.json.get('user_id')
-    label = request.json.get('label')
-    doc_id = request.json.get('document_id')
-    response_time = request.json.get('response_time')
-    actual_label = request.json.get('actual_label')
-
+def nist_recommend(user_id, label, document_id, response_time, actual_label):
     conn = create_connection()
     cursor = conn.execute('SELECT mode FROM users WHERE id = ?', (user_id,))
     row = cursor.fetchone()
@@ -81,12 +76,12 @@ def nist_recommend():
     if row:
         mode = row[0]
         user =  user_instances[user_id]
-        ltr, lte, gtr, gte, result = user.round_trip1(label, doc_id, response_time)
+        ltr, lte, gtr, gte, result = user.round_trip1(label, document_id, response_time)
 
         # Save the label, doc_id, and response_time for the current user_id
 
         conn.execute('INSERT INTO recommendations (user_id, label, doc_id, response_time, actual_label, local_training_acc, local_testing_acc, global_training_acc, global_testing_acc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                     (user_id, label, doc_id, response_time, actual_label, ltr, lte, gtr, gte))
+                     (user_id, label, document_id, response_time, actual_label, ltr, lte, gtr, gte))
         conn.commit()
 
         result['code'] = 200
@@ -117,10 +112,10 @@ def get_list(user_id):
         return jsonify({"code": 404, "msg": "User not found"})
 
 # @app.route('/get_document_information', methods=['POST'])
-def get_doc_info():
+def get_doc_info(user_id, doc_id):
     print('fetching document information')
-    user_id = request.json.get('user_id')
-    doc_id = request.json.get('document_id')
+    # user_id = request.json.get('user_id')
+    # doc_id = request.json.get('document_id')
 
     conn = create_connection()
     cursor = conn.execute('SELECT mode FROM users WHERE id = ?', (user_id,))
@@ -146,7 +141,8 @@ This is frontend session
 '''
 
 init_db()
-all_texts = './Data/Nist_all_labeled.json'
+all_texts = json.load.open('./Data/Nist_all_labeled.json')
+true_labels = all_texts['label']
 
 app.config['SECRET_KEY'] = os.urandom(24).hex()
 app.config["SESSION_PERMANENT"] = False
@@ -270,3 +266,134 @@ def non_active_list(name):
         return redirect(url_for("finish"))
 
     return render_template("nonactive.html",sliced_results=sliced_results, results=results, name=name, keywords=keywords, recommended=recommended, document_list = topics["cluster"])
+
+@app.route("//acitve//<name>//<document_id>/", methods=["GET", "POST"])
+def active(name, document_id):
+    topics = get_list(session['user_id'])
+    print(topics.keys())
+
+    # results = get_texts(topic_list=topics, all_texts=all_texts)
+    text = all_texts["text"][str(document_id)]
+    st =time.time()
+
+    user_labels = user_instances[session['user_id']].user_labels
+    # old_labels = list(set(predictions))
+    old_labels = list(user_labels)
+
+    print(old_labels)
+    if request.method =="POST":
+        name=name
+        document_id=document_id
+        user_id = session["user_id"]
+        et = time.time()
+        response_time = st- et
+        label = request.form.get("label").replace(' ', '').lower()
+
+        save_response(name, label, response_time, document_id, user_id)
+        # recommend_document = url + "//recommend_document"
+        
+
+        result = nist_recommend(user_id, label, document_id, response_time, true_labels[str(document_id)])
+
+        
+        if result['code'] == 200:
+            next = result['document_id']
+
+            return redirect(url_for("active", name=name, document_id=next, predictions=old_labels))
+        else:
+            return render_template("activelearning.html", text =text, predictions=old_labels ) 
+            # return jsonify({"code": 404, "msg": "User not found"})
+
+  
+ 
+    return render_template("activelearning.html", text =text, predictions=old_labels ) 
+
+
+@app.route("//get_label//<document_id>//", methods=["POST", 'GET'])
+def get_label(document_id):
+    document_id = document_id 
+    user_id=session["user_id"] 
+    # get_document_information = url + "//get_document_information"
+    # data = requests.post(get_document_information, json={ "document_id": document_id,
+    #                                                     "user_id":user_id
+    #                                                      }).json()
+    data = get_doc_info(user_id, document_id)                                               
+
+
+    return redirect( url_for("label", response=data, name=session["name"], document_id=document_id))
+
+
+@app.route("/logout", methods=["POST", "GET"])
+def finish():
+    name = session['name']
+    session.pop(name, None)
+    return redirect(url_for("login"))
+
+@app.before_request
+def require_login():
+    allowed_route = ['login']
+    if request.endpoint not in allowed_route and "name" not in session:
+        return redirect(url_for("login"))
+    
+@app.route('//non_active_label//<name>//<document_id>/', methods=["POST", "GET"])
+def non_active_label(name, document_id):
+    st = time.time()
+    # get_document_information = url + "//get_document_information"
+    # response = requests.post(get_document_information, json={ "document_id": document_id,
+    #                                                     "user_id":session["user_id"]
+    #                                                      }).json()
+
+    user_id = session[user_id]
+    response = get_doc_info(user_id, document_id) 
+
+    text = all_texts["text"][str(document_id)]
+    words = get_words(response["topic"],  text)
+    user_labels = user_instances[user_id].user_labels
+    
+    old_labels = list(user_labels)
+
+    if request.method =="POST":
+        name=name 
+        document_id=str(document_id)
+        user_id = session["user_id"]
+        et = time.time()
+        response_time = et - st
+        label = request.form.get("label")
+        # recommend_document = "https://nist-topic-model.umiacs.umd.edu/recommend_document"
+        # recommend_document = url + "//recommend_document"
+        # posts = requests.post(recommend_document, json={
+        # "user_id" : int(user_id),
+        # "label": label,
+        # "response_time": response_time,
+        # "document_id" : document_id
+        # }).json()
+
+        posts = nist_recommend(user_id, label, document_id, response_time, true_labels[str(document_id)])
+
+
+        # print(posts.keys())
+        next = posts["document_id"]
+        # predictions.append(label.lower())
+        # old_labels = list(set(predictions))
+        # print(old_labels)
+
+        save_response(name, label, response_time, document_id, user_id)
+        # get_document_information = url + "//get_document_information"
+        # response = requests.post(get_document_information, json={ "document_id": posts["document_id"],
+        #                                                 "user_id":session["user_id"]
+        #                                                  }).json()
+        
+        response = get_doc_info(user_id, next)
+        # print(response["prediction"]) 
+        return redirect(url_for("non_active_label", response=response, words=words, document_id=posts["document_id"], name=name, predictions=old_labels, pred=response["prediction"]))
+
+    return render_template("nonactivelabel.html", response=response, words=words, document_id=document_id, text=text, name=name, predictions=old_labels, pred=response["prediction"])
+
+@app.route("/non_active/<name>/<topic_id>//<documents>")
+def topic(name, topic_id, documents):
+    print(topic_id)
+    # res = get_single_document(documents, all_texts)
+    # print(res)
+    res = get_single_document(documents.strip("'[]'").split(", "), all_texts)
+
+    return  render_template("topic.html", res = res, topic_id=topic_id)  
