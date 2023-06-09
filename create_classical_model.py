@@ -14,7 +14,7 @@ from pprint import pprint
 
 
 class Create_Model():
-    def __init__(self, num_topics, num_iters, model_type, load_data_path, train_len):
+    def __init__(self, num_topics, num_iters, model_type, load_data_path, train_len, user_labels):
         self.num_topics = num_topics
         self.model_type = model_type
         self.load_data_path = load_data_path
@@ -61,7 +61,12 @@ class Create_Model():
                 corpus.add_doc(ngrams)
         elif self.model_type == 'SLDA':
             for i, ngrams in enumerate(datawords_nonstop):
-                corpus.add_doc(ngrams, y=[np.nan])
+                if i >=100:
+                    corpus.add_doc(ngrams, y=[np.nan])
+                elif i >100 and i <= 300:
+                    corpus.add_doc(ngrams,y=[1])
+                else:
+                    corpus.add_doc(ngrams,y=[0])
                 # y = [0 for _ in range(len(label_set))]
                 # null_y = [np.nan for _ in range(len(label_set))]
                 # # y = [3 for i in range(20)]
