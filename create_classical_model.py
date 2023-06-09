@@ -61,16 +61,17 @@ class Create_Model():
                 corpus.add_doc(ngrams)
         elif self.model_type == 'SLDA':
             for i, ngrams in enumerate(datawords_nonstop):
-                y = [0 for _ in range(len(label_set))]
-                null_y = [np.nan for _ in range(len(label_set))]
-                # y = [3 for i in range(20)]
-                if labels and not labels[i] == 'None':
-                    label = labels[i]
-                    y[label_dict[label]] = 1
-                    corpus.add_doc(ngrams, y=y)
-                    # print(y)
-                else:
-                    corpus.add_doc(ngrams, y=null_y)
+                corpus.add_doc(ngrams, y=[np.nan])
+                # y = [0 for _ in range(len(label_set))]
+                # null_y = [np.nan for _ in range(len(label_set))]
+                # # y = [3 for i in range(20)]
+                # if labels and not labels[i] == 'None':
+                #     label = labels[i]
+                #     y[label_dict[label]] = 1
+                #     corpus.add_doc(ngrams, y=y)
+                #     # print(y)
+                # else:
+                #     corpus.add_doc(ngrams, y=null_y)
                             
         else:
             raise Exception("unsupported model type!")
@@ -84,12 +85,12 @@ class Create_Model():
             # 'min_cf': 2, 'min_df': 4, 'iterations': 145, 'var': 'l', 'glm_param': 5.252727047556928, 
             # 'nu_sq': 6.7920065058884145}
 
-            nu_sq = [5 for i in range(len(label_set))]
-            glm_param = [1.1 for i in range(len(label_set))]
+            # nu_sq = [5 for i in range(len(label_set))]
+            # glm_param = [1.1 for i in range(len(label_set))]
             alpha = 0.43141738585649325
             eta = 0.9614396430577419
             min_cf = 2; min_df = 4; self.num_iters = 2500
-            var_param = ['l' for _ in range(len(label_set))]
+            # var_param = ['l' for _ in range(len(label_set))]
             # glm_param = [5.252727047556928 for _ in range(len(label_set))] 
             # nu_sq = [6.7920065058884145 for _ in range(len(label_set))]
             # glm_param = 5.252727047556928
@@ -98,6 +99,9 @@ class Create_Model():
             # mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= glm_param, nu_sq = nu_sq, alpha =alpha, eta=eta, min_cf=min_cf, min_df=min_df)
             # mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, glm_param= glm_param, nu_sq = nu_sq, alpha =alpha, eta=eta)
             # print(mdl.f)
+            var_param = ['l']
+            nu_sq = [6.79]
+            glm_param = [5.25]
             mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, nu_sq=nu_sq,glm_param=glm_param)
                     
         elif self.model_type == 'LDA':

@@ -7,6 +7,7 @@ import re
 from spacy.lang.en.stop_words import STOP_WORDS
 import pickle
 import argparse
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Preprocessing():
     def __init__(self, data_path):
@@ -37,7 +38,10 @@ class Preprocessing():
         for word in new_words_to_remove:
             stop_words.add(word)
 
-                #Creating and updating our list of tokens using list comprehension 
+        # Use TF-IDF to remove boring words
+        tf_idf_words = self.get_filtered_words(data, 3)
+
+        #Creating and updating our list of tokens using list comprehension 
         if 'newsgroup' in data_path:
             for doc in docs:
                 temp_doc = []
@@ -63,8 +67,20 @@ class Preprocessing():
                 self.data_words_nonstop.append(temp_doc)
                 self.word_spans.append(temp_span)
         
+        filtered_datawords_nonstop = [[''.join(char for char in tok if char.isalpha() or char.isspace()) for tok in doc] for doc in self.data_words_nonstop]
+        self.data_words_nonstop = filtered_datawords_nonstop
         self.labels = df.label.values.tolist()
-        
+    
+    def get_filtered_words(self, text, threthold):
+        vectorizer = TfidfVectorizer()
+
+        vectorizer.fit(text)
+        # Get feature names and their idf values
+        feature_names = vectorizer.get_feature_names_out()
+        idf_values = vectorizer.idf_
+        low_importance_words = [word for word, idf in zip(feature_names, idf_values) if idf <= threthold]
+        return low_importance_words
+
     def save_data(self, save_path):
          print('saving data...')
          print(self.data_words_nonstop[0])
@@ -96,7 +112,7 @@ def main():
     
     args = argparser.parse_args()
     process_obj = Preprocessing(args.doc_dir)
-    process_obj.convert_clean_data_to_json('./Data/processed_nist_all_labeled_1000.json')
+    # process_obj.convert_clean_data_to_json('./Data/processed_nist_all_labeled_1000.json')
     process_obj.save_data(args.save_path)
 
 if __name__ == "__main__":
