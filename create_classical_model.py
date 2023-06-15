@@ -213,7 +213,7 @@ def main():
 
     args = argparser.parse_args()
     
-    Model = Create_Model(args.num_topics, args.num_iters, args.model_type, args.load_data_path, args.train_len)
+    Model = Create_Model(args.num_topics, args.num_iters, args.model_type, args.load_data_path, args.train_len, [])
     save_path = './Model/{}_{}.pkl'.format(args.model_type, args.num_topics)
     Model.train(save_path)
     

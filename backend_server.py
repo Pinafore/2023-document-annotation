@@ -8,20 +8,20 @@ import pickle
 
 # doc_dir = './Data/newsgroup_sub_500.json'
 # processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
-doc_dir = './Data/Nist_all_labeled.json'
-processed_doc_dir = './Data/nist_all_labeled.pkl'
+doc_dir = './Data/CongressionalBill/congressional_bills.json'
+processed_doc_dir = './Data/congressional_bill_processed.pkl'
 model_types_map = {1: 'LDA', 2: 'SLDA', 3: 'ETM'}
 num_iter = 1200
 load_data = True
 save_model = False
 load_model_path = './Model/{}_model_data.pkl'
 # num_topics = 20
-num_topics = 13
+num_topics = 20
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = False
 USE_PROCESSED_TEXT = False
-training_length = 500
+training_length = 258
 REGRESSOR_PREDICT = False
 
 
@@ -243,6 +243,7 @@ class User():
             result = {}
             cluster = {}
             cluster["1"] = list(range(len(self.df)))
+            print(cluster)
             result['cluster'] = cluster
             recommend_result = self.round_trip1('start', 13, "3")
             # print('recommend document')
