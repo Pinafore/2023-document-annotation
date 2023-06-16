@@ -9700,3 +9700,36 @@ unique user labels length is 1
  * Running on http://127.0.0.1:6000
  * Running on http://192.168.74.24:6000
 [33mPress CTRL+C to quit[0m
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:6000
+ * Running on http://192.168.74.24:6000
+[33mPress CTRL+C to quit[0m
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.74.24:5001
+[33mPress CTRL+C to quit[0m
+192.168.7.236 - - [15/Jun/2023 10:53:25] "GET / HTTP/1.1" 200 -
+192.168.7.236 - - [15/Jun/2023 10:53:25] "[33mGET /static/nistprep.js HTTP/1.1[0m" 404 -
+192.168.7.236 - - [15/Jun/2023 10:53:30] "GET / HTTP/1.1" 200 -
+192.168.7.236 - - [15/Jun/2023 10:53:33] "GET / HTTP/1.1" 200 -
+192.168.7.236 - - [15/Jun/2023 10:53:33] "[33mGET /loop1/labeled_list/ HTTP/1.1[0m" 404 -
+192.168.7.236 - - [15/Jun/2023 10:53:34] "[33mGET /login HTTP/1.1[0m" 404 -
+192.168.7.236 - - [15/Jun/2023 10:53:34] "[33mGET /static/data.css HTTP/1.1[0m" 404 -
+[2023-06-15 10:54:48,296] ERROR in app: Exception on /get_topic_list [POST]
+Traceback (most recent call last):
+  File "/nfshomes/zli12321/micromamba/envs/myenv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/nfshomes/zli12321/micromamba/envs/myenv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/nfshomes/zli12321/micromamba/envs/myenv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/nfshomes/zli12321/micromamba/envs/myenv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/srv/www/active-topic-modeling/project_backend/app.py", line 110, in get_list
+    user =  user_instances[user_id]
+KeyError: 24
+127.0.0.1 - - [15/Jun/2023 10:54:48] "[35m[1mPOST /get_topic_list HTTP/1.1[0m" 500 -

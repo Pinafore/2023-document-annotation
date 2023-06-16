@@ -4,6 +4,9 @@ from User import User
 from scipy.sparse import vstack
 import numpy as np
 from sklearn.metrics import accuracy_score
+import multiprocessing
+import os
+import pickle
 
 # This var means if True, when labeling the same doc, the next recommend doc would 
 # be the same
@@ -89,6 +92,10 @@ class NAITM():
             self.existing_labels = df['label'].tolist()
         
 
+    def update_doc_probs(self, doc_prob, doc_topic_prob):            
+        self.doc_topic_prob = np.array(doc_topic_prob)
+        self.doc_probs = doc_prob
+
     def initialize_classifier(self, classifier_type: str):
         classifier_type = classifier_type.lower()
 
@@ -129,9 +136,9 @@ class NAITM():
     def preference(self):
         if self.mode == 1:
             if len(self.classes) < 2:
-                print('-----------')
-                print('classes smaller than 2')
-                print('-----------')
+                # print('-----------')
+                # print('classes smaller than 2')
+                # print('-----------')
                 # print('median pro is {}'.format(self.median_pro))
                 
 
@@ -143,7 +150,7 @@ class NAITM():
                 #     # probs.pop(max_topic_idx)
                 #     probs[max_topic_idx] = -1
                 #     max_topic_idx = probs.index(max(probs))
-                print('starting while loop')
+                # print('starting while loop')
                 
                 i = 0
                 # while self.doc_probs[max_topic_idx][0][0] in self.recommended_doc_ids and i < len(self.classes):
@@ -152,7 +159,7 @@ class NAITM():
                     max_topic_idx = probs.index(max(probs))
                     i += 1
 
-                print('finish while loop')
+                # print('finish while loop')
 
                 self.last_recommended_topic = max_topic_idx
 
@@ -198,9 +205,9 @@ class NAITM():
                 return chosen_idx, self.scores[chosen_idx]
         else:
             if len(self.classes) < 2:
-                print('-----------')
-                print('num classes smaller than 2')
-                print('-----------')
+                # print('-----------')
+                # print('num classes smaller than 2')
+                # print('-----------')
                 # print('median pro is {}'.format(self.median_pro))
                 random_doc_id = random.randint(0, self.train_length)
 
@@ -240,23 +247,24 @@ class NAITM():
                 self.recommended_doc_ids.add(chosen_idx)
                 return chosen_idx, self.scores[chosen_idx]
 
-            
+
     def recommend_document(self):
         document_id, score = self.preference()
-        # self.num_docs_labeled += 1
         print(self.classes)
- 
         return document_id, score
+
 
     def is_labeled(self, doc_id):
         return doc_id in self.user_labels
 
     def update_classifier(self):
         if self.mode == 1:
-            print('doc topic prob shape {}'.format(self.doc_topic_prob.shape))
+            # print('doc topic prob shape {}'.format(self.doc_topic_prob.shape))
             guess_label_probas = self.classifier.predict_proba(self.text_vectorizer[0:self.train_length])
             guess_label_logprobas = self.classifier.predict_log_proba(self.text_vectorizer[0:self.train_length])
-            scores = -np.sum(guess_label_probas*guess_label_logprobas*self.doc_topic_prob[:,:len(self.classes)], axis = 1)
+
+            # Change this part
+            scores = -np.sum(guess_label_probas*guess_label_logprobas*self.doc_topic_prob[:,:1], axis = 1)
 
             self.scores = scores
         else:
@@ -297,7 +305,7 @@ class NAITM():
                         if global_classifier:
                             self.global_classifier.partial_fit(self.documents_track, self.labels_track, self.global_classes)
             elif user_label in self.classes:  
-                print('all labels have, keep classes same but increase documents')
+                # print('all labels have, keep classes same but increase documents')
                 # label_num = self.user_label_number_map[user_label]   
                 self.user_labels[doc_id] = user_label
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
@@ -318,9 +326,9 @@ class NAITM():
                         # self.update_median_prob(label_num)
                         self.update_median_prob(self.last_recommended_topic)
                 else:
-                    print('-----------')
-                    print('start incremental learning')
-                    print('-----------')
+                    # print('-----------')
+                    # print('start incremental learning')
+                    # print('-----------')
                     self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
                     # self.classifier.partial_fit(self.text_vectorizer[doc_id], [label_num], self.classes)
 
@@ -333,7 +341,7 @@ class NAITM():
 
                 print('\033[1mnum docs labeled {}\033[0m'.format(self.num_docs_labeled))
             else:
-                print('\033[1mImplement this part: Creating a new label\033[0m')
+                # print('\033[1mImplement this part: Creating a new label\033[0m')
                 # label_num = len(self.classes)
                 self.classes.append(user_label)
                 self.id_vectorizer_map[doc_id] = self.num_docs_labeled
@@ -353,9 +361,9 @@ class NAITM():
                         # self.update_median_prob(label_num)
                         self.update_median_prob(self.last_recommended_topic)
                 else:
-                    print('-----------')
-                    print('start incremental learning')
-                    print('-----------')
+                    # print('-----------')
+                    # print('start incremental learning')
+                    # print('-----------')
                     self.classifier = self.initialize_classifier('logreg')
                     self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
                     # self.classifier.partial_fit(self.text_vectorizer[doc_id], [label_num], self.classes)

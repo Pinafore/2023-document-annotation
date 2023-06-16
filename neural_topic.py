@@ -143,6 +143,6 @@ file = './Data/newsgroup_sub_500_processed.pkl'
 # file = './Data/nist_all_labeled.pkl'
 file = './Data/congressional_bill_processed.pkl'
 
-create_neural_model_and_save(20, file)
+create_neural_model_and_save(6, file)
 # create_neural_model_and_save(21, file)
 # create_neural_model_and_save(22, file)
