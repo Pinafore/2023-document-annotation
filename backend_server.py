@@ -18,7 +18,7 @@ load_data = True
 save_model = False
 load_model_path = './Model/{}_model_data.pkl'
 # num_topics = 20
-num_topics = 6
+num_topics =20
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = False
@@ -133,7 +133,7 @@ class User():
             # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
             #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
             #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-        
+            print(result)
             return result
         elif self.mode ==0:
             # if len(self.user_labels) < 2:
@@ -308,7 +308,7 @@ class User():
             result = {}
             cluster = {}
             cluster["1"] = list(range(len(self.df)))
-            print(cluster)
+            # print(cluster)
             result['cluster'] = cluster
             recommend_result = self.round_trip1('start', 13, "3")
             # print('recommend document')

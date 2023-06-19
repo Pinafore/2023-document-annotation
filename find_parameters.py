@@ -22,8 +22,8 @@ def calculate_coherence(model):
     
     return coherence_model.get_score()
 
-def train_lda_model(alpha, eta, k, min_cf, min_df, corpus, iterations):
-    model = tp.LDAModel(alpha=alpha, eta=eta, k=k, min_cf=min_cf, min_df=min_df)
+def train_lda_model(alpha, eta, k, corpus, iterations):
+    model = tp.LDAModel(alpha=alpha, eta=eta, k=k)
     model.add_corpus(corpus)
     
     for _ in range(iterations):
@@ -72,31 +72,7 @@ def build_corpus(path, model_type):
             result_corpus.add_doc(ngrams)
     return result_corpus
 
-def optimize_hyperparameters(document_path, alpha_range, eta_range, k_range, min_cf_range, min_df_range, iterations_range):
-    corpus = build_corpus(document_path)
-    best_hyperparameters = None
-    best_perplexity = float('inf')
-    best_coherence = float('-inf')
 
-    for alpha, eta, k, min_cf, min_df, iterations in itertools.product(alpha_range, eta_range, k_range, min_cf_range, min_df_range, iterations_range):
-        model = train_lda_model(alpha, eta, k, min_cf, min_df, corpus, iterations)
-        perplexity = calculate_perplexity(model)
-        coherence = calculate_coherence(model)
-
-
-        if perplexity < best_perplexity and coherence > best_coherence:
-            best_hyperparameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations}
-            best_perplexity = perplexity
-            best_coherence = coherence
-            print(f'New best hyperparameters: {best_hyperparameters}, perplexity: {best_perplexity}, coherence: {best_coherence}')
-        else:
-            curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations}
-            print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
-
-    return best_hyperparameters
-
-
-    return best_hyperparameters
 
 def normalize(value, min_value, max_value):
     return (value - min_value) / (max_value - min_value)
@@ -105,12 +81,12 @@ def normalize(value, min_value, max_value):
 
 def objective(params, corpus, min_perplexity, max_perplexity, min_coherence, max_coherence, perplexity_weight, coherence_weight, model_type):
     # alpha, eta, k, min_cf, min_df, iterations = params
-    k = 20
+    # k = 20
     if model_type == 'LDA':
-        alpha, eta, min_cf, min_df, iterations = params
+        alpha, eta, iterations, k = params
 
         # print('alpha is {}, eta is {}'.format(alpha, eta))
-        model = train_lda_model(alpha, eta, k, min_cf, min_df, corpus, iterations)
+        model = train_lda_model(alpha, eta, k, corpus, iterations)
     elif model_type =='SLDA':
         # print('getting into objective')
         alpha, eta, min_cf, min_df, iterations, var_type, glm_param, nu_sq = params
@@ -151,8 +127,8 @@ if __name__ == '__main__':
     args = argparser.parse_args()
     MODEL = args.model
 
-    k = 20
-    file_path = './Data/newsgroup_sub_500_processed.pkl'
+    # k = 20
+    file_path = './Data/congressional_bill_processed.pkl'
     corpus = build_corpus(file_path, MODEL)
 
     def create_callback():
@@ -167,7 +143,7 @@ if __name__ == '__main__':
         return print_iteration_number
     
     min_perplexity = 10
-    max_perplexity = 1500
+    max_perplexity = 3000
     min_coherence = -1
     max_coherence = 1
     perplexity_weight = 0.2
@@ -179,9 +155,10 @@ if __name__ == '__main__':
             Real(0.1, 1.0, name='alpha'),
             Real(0.1, 1.0, name='eta'),
             # Integer(20, 20, name='k'),
-            Integer(1, 5, name='min_cf'),
-            Integer(1, 5, name='min_df'),
-            Integer(50, 250, name='iterations')
+            # Integer(1, 5, name='min_cf'),
+            # Integer(1, 5, name='min_df'),
+            Integer(50, 250, name='iterations'),
+            Integer(2, 20, name='k')
         ]
 
         res_gp = gp_minimize(
@@ -196,9 +173,9 @@ if __name__ == '__main__':
         best_hyperparameters = {
             'alpha': res_gp.x[0],
             'eta': res_gp.x[1],
-            # 'k': res_gp.x[2],
-            'min_cf': res_gp.x[2],
-            'min_df': res_gp.x[3],
+            'k': res_gp.x[2],
+            # 'min_cf': res_gp.x[2],
+            # 'min_df': res_gp.x[3],
             'iterations': res_gp.x[4]
         }
 
