@@ -25,8 +25,10 @@ def main():
     args = argparser.parse_args()
     
 
-    doc_dir = './Data/newsgroup_sub_500.json'
-    processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
+    # doc_dir = './Data/newsgroup_sub_500.json'
+    # processed_doc_dir = './Data/newsgroup_sub_500_processed.pkl'
+    doc_dir = './Data/CongressionalBill/congressional_bills.json'
+    processed_doc_dir = './Data/congressional_bill_processed.pkl'
 
     if args.model_type == 'ETM':
         model = Neural_Model('./Model/ETM_{}.pkl'.format(args.num_topics), processed_doc_dir, doc_dir)

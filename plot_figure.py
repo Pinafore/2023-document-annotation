@@ -35,22 +35,17 @@ def plot(save_path, data_structure):
 Read all recommendations and print them on terminal
 '''
 def read_all_recommendations(db_name):
-    conn = sqlite3.connect(db_name)
-    cursor = conn.execute('SELECT * FROM recommendations')
-    rows = cursor.fetchall()
+    with sqlite3.connect(db_name) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT user_id, label, doc_id, response_time FROM recommendations')
+        rows = cursor.fetchall()
 
-    for i, row in enumerate(rows):
-        # print(row)
-        print('Recommendation ID: {}, User ID: {}, Label: {}, Doc ID: {}, Response Time: {}'.format(row[0], row[1], row[2], row[3], row[4]))
-        # print(row[5])
-        print(row[6])
-        print(row[7])
-        print(row[8])
-        print(row[9])
-        # if i == 2:
-        #     break
-
-    conn.close()
+    for row in rows:
+        print('user_id: ', row[0])
+        print('label: ', row[1])
+        print('doc_id: ', row[2])
+        print('response_time: ', row[3])
+        print('-----')
 
 
 '''
@@ -125,10 +120,12 @@ def plot_comparison(id1, id2, db_name, acc_type, id1_name, id2_name, save_path):
 
 database_name = 'local_users.db'
 database_name = 'server_users.db'
+database_name = './database/06_21_2023.db'
 acc_type = 'global_training_acc'
 
-print_users_and_modes(database_name)
-# read_all_recommendations(database_name)
+
+# print_users_and_modes(database_name)
+read_all_recommendations(database_name)
 exit(0)
 plot_comparison(55, 62, database_name, acc_type, 'hand SLDA','opt SLDA', './plot_results/hand_SLDA_vs_opt_min_cf_SLDA.png')
 

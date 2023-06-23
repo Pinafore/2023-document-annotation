@@ -13,9 +13,10 @@ app = Flask(__name__)
 all_texts = json.load(open("./Data/CongressionalBill/congressional_bills.json"))
 true_labels = list(all_texts['label'].values())
 
-DATABASE = 'local_users.db'
-DATABASE = 'server_users.db'
-DATABASE = 'beta_testing.db'
+DATABASE = './database/local_users.db'
+DATABASE = './database/server_users.db'
+DATABASE = './database/beta_testing.db'
+DATABASE = './database/06_21_2023.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]
@@ -89,7 +90,7 @@ def nist_recommend(user_id, label, doc_id, response_time):
     if row:
         mode = row[0]
         user =  user_instances[user_id]
-        ltr, lte, gtr, gte, result = user.round_trip1(label, doc_id, response_time)
+        ltr, lte, gtr, gte, result = user.round_trip1(label, doc_id, response_time, user_id)
 
         # Save the label, doc_id, and response_time for the current user_id
 
@@ -108,7 +109,7 @@ def nist_recommend(user_id, label, doc_id, response_time):
         return {"code": 404, "msg": "User not found"}
 
 # @app.route('/get_topic_list', methods=['POST'])
-def get_list(user_id):
+def get_list(user_id, recommend_action):
     # user_id = request.json.get('user_id')
 
     conn = create_connection()
@@ -117,7 +118,25 @@ def get_list(user_id):
     if row:
         # mode = row[0]
         user =  user_instances[user_id]
-        result = user.get_document_topic_list()
+        result = user.get_document_topic_list(recommend_action)
+        result['code'] = 200
+        result['msg'] = 'SUCCESS'
+        conn.close()
+        # return jsonify(result)
+        return result
+    else:
+        conn.close()
+        # return jsonify({"code": 404, "msg": "User not found"})
+        return {"code": 404, "msg": "User not found"}
+
+def check_active_list(user_id):
+    conn = create_connection()
+    cursor = conn.execute('SELECT mode FROM users WHERE id = ?', (user_id,))
+    row = cursor.fetchone()
+    if row:
+        # mode = row[0]
+        user =  user_instances[user_id]
+        result = user.check_active_list()
         result['code'] = 200
         result['msg'] = 'SUCCESS'
         conn.close()
@@ -241,10 +260,12 @@ def active_check(name):
         return redirect("/login")
 
 
-    topics = get_list(session['user_id'])
+    # topics = get_list(session['user_id'], False)
+    topics = check_active_list(session['user_id'])
 
-    print(topics)
+    # print(topics)
     if len(topics["cluster"].keys()) == 1:
+    # if int(session['user_id'])%4 == 0:
         return redirect(url_for("active_list", name=name))
     else:
         return redirect(url_for("non_active_list", name=name))
@@ -255,12 +276,8 @@ def active_list(name):
     # if not there in the session then redirect to the login page
         return redirect("/login")
 
-    # get_topic_list = url + "//get_topic_list"
-    # topics = requests.post(get_topic_list, json={
-    #                         "user_id": session['user_id']
-    #                         }).json()
 
-    topics = get_list(session['user_id'])
+    topics = get_list(session['user_id'], True)
     rec = str(topics["document_id"])
     docs = list(set(session["labelled_document"].strip(",").split(",")))
     # print(docs)
@@ -279,17 +296,17 @@ def non_active_list(name):
         return redirect("/login")
 
     # get_topic_list = url + "//get_topic_list" 
-    topics = get_list(session['user_id'])
+    topics = get_list(session['user_id'], True)
         # print(session)
 
     recommended = int(topics["document_id"])
 
     docs = list(set(session["labelled_document"].strip(",").split(",")))
     docs_len = len(docs)
-    print(recommended)
+    # print(recommended)
 
     recommended_topic, recommended_block = get_recommended_topic(recommended, topics, all_texts)
-    print(recommended_block)
+    # print(recommended_block)
 
     results = get_texts(topic_list=topics, all_texts=all_texts, docs=docs)
 
@@ -305,10 +322,10 @@ def non_active_list(name):
     return render_template("nonactive.html", sliced_results=sliced_results, results=results, name=name, keywords=keywords, recommended=str(recommended), document_list = topics["cluster"], docs_len = docs_len, recommended_block=recommended_block, recommended_topic=recommended_topic)
 
 
- 
+
 @app.route("//active//<name>//<document_id>/", methods=["GET", "POST"])
 def active(name, document_id):
-    topics = get_list(session['user_id'])
+    # topics = get_list(session['user_id'], True)
 
     text = all_texts["text"][str(document_id)]
 
@@ -323,11 +340,15 @@ def active(name, document_id):
         label = request.form.get("label").lower()
         drop = request.form.get("suggestion").lower()
 
+
+        
+        # This line has a big problem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         label = str(drop) + str(label)
+        label = label.strip()
         name=name
         document_id=document_id
         user_id = session["user_id"]
-
+        
         st = datetime.strptime(session["start_time"].strip("+").split("+")[-2], "%H:%M:%S")
         et = datetime.strptime(session["start_time"].strip("+").split("+")[-1], "%H:%M:%S")
 
@@ -359,7 +380,10 @@ def active(name, document_id):
         # print('waiting to get to the next page')
         return redirect(url_for("active", name=name, document_id=next))
         # return redirect(url_for("active", name=name, document_id=next, predictions=labels, docs_len = docs_len, total=total))
-    return render_template("activelearning.html", text =text, predictions=labels, docs_len=docs_len, document_id=document_id, total=total ) 
+    print('labels are {}'.format(labels))
+    user_id = int(session['user_id'])
+    response = get_doc_info(document_id, user_id)
+    return render_template("activelearning.html", text =text, predictions=labels, pred=response["prediction"], docs_len=docs_len, document_id=document_id, total=total ) 
 
     
 
@@ -415,7 +439,7 @@ def non_active_label(name, document_id):
     total = len(all_texts["text"].keys())
     docs = list(set(session["labelled_document"].strip(",").split(",")))
     docs_len = len(docs)
-    print(docs_len)
+    # print(docs_len)
     print(response)
 
 
@@ -424,6 +448,7 @@ def non_active_label(name, document_id):
         label = request.form.get("label").lower()
         drop = request.form.get("suggestion").lower()
         label = str(drop)+str(label)
+        label = label.strip()
 
         name=name 
         document_id=str(document_id)

@@ -51,7 +51,7 @@ class User():
                 loaded_test_data = pickle.load(inp)
                 self.processed_test_data = loaded_test_data['datawords_nonstop']
 
-        self.initial = True
+        
         self.user_labels = set()
 
         if mode != 0:
@@ -106,6 +106,7 @@ class User():
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df)
 
     def get_doc_information(self, doc_id):
+        print('calling get document information')
         result = dict()
         print('getting document information...')
         print('mode is ', self.mode)
@@ -119,11 +120,11 @@ class User():
             if len(self.user_labels) >= 2:
                 result['prediction'] = self.alto.predict_label(int(doc_id))
             else:
-                result['prediction'] ='Create at least 2 labels to start model suggestion'
+                result['prediction'] ='Model suggestion starts after two distinct labels are created 2 labels to start model suggestion'
 
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
-            #     result['prediction'] = "Create at least two labels to start active learning"
+            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
                 
@@ -133,12 +134,12 @@ class User():
             # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
             #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
             #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-            print(result)
+            # print(result)
             return result
         elif self.mode ==0:
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
-            #     result['prediction'] = "Create at least two labels to start active learning"
+            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
             result['prediction'] = self.alto.predict_label(int(doc_id))
@@ -149,24 +150,22 @@ class User():
             # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
             #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
             #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-            print('result is ...')
-            print(result)
+            # print('result is ...')
+            # print(result)
             return result
 
     def sub_roundtrip(self, label, doc_id, response_time):
         result = dict()
 
         if self.mode == 2:
-            if not self.initial and isinstance(label, str):
-                self.user_labels.add(label)
-
-            if not self.initial and isinstance(label, str):
+            if isinstance(label, str):
                 print('calling self.label...')
+                self.user_labels.add(label)
                 self.alto.label(int(doc_id), label)
                         
-            self.initial = False
+            
             # print(self.topics)
-            random_document, _ = self.alto.recommend_document()
+            random_document, _ = self.alto.recommend_document(True)
              
             result['document_id'] = str(random_document)
                     
@@ -178,17 +177,14 @@ class User():
             else:
                 return -1, -1, -1, -1, result
         elif self.mode == 1 or self.mode == 3:
-            # if label:
-            if not self.initial and isinstance(label, str):
-                self.user_labels.add(label)
-
-            if not self.initial and isinstance(label, str):
+            if isinstance(label, str):
                 print('calling self.label...')
+                self.user_labels.add(label)
                 self.alto.label(int(doc_id), label)
                     
-            self.initial = False
+            
             # print(self.topics)
-            random_document, _ = self.alto.recommend_document()
+            random_document, _ = self.alto.recommend_document(True)
             # result['raw_text'] = self.raw_texts[random_document]
             # result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
@@ -202,7 +198,7 @@ class User():
 
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
-            #     result['prediction'] = "Create at least two labels to start active learning"
+            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
                     
@@ -215,15 +211,13 @@ class User():
             
             # return -1, -1, -1, -1, result
         elif self.mode == 0:
-            if not self.initial and isinstance(label, str):
+            if isinstance(label, str):
                 self.user_labels.add(label)
-
-            if not self.initial and isinstance(label, str):
                 self.alto.label(int(doc_id), label)
                     
-            self.initial = False
+        
 
-            random_document, _ = self.alto.recommend_document()
+            random_document, _ = self.alto.recommend_document(True)
             # result['raw_text'] = self.raw_texts[random_document]
             # result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
@@ -232,7 +226,7 @@ class User():
 
             # if len(self.user_labels) < 2:
             #     self.user_labels.add(label)
-            #     result['prediction'] = "Create at least two labels to start active learning"
+            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
             # else:
             #     result['prediction'] = random.sample(self.user_labels, 1)[0]
 
@@ -251,17 +245,18 @@ class User():
         else:
             return -1, -1, -1, -1, result
 
-    def update_slda(self):
-        self.model = Topic_Model(num_topics, 2500, model_types_map[self.mode], processed_doc_dir, training_length, self.alto.user_labels, False, None)
-        self.model.train('./Model/SLDA_user1.pkl')
+    def update_slda(self, user_id):
+        model = Topic_Model(num_topics, 2500, model_types_map[self.mode], processed_doc_dir, training_length, self.alto.user_labels, False, None)
+        model.train('./Model/SLDA_user{}.pkl'.format(user_id))
 
-    def round_trip1(self, label, doc_id, response_time):
+    def round_trip1(self, label, doc_id, response_time, user_id):
+        print('calling round trip')
         if model_types_map[self.mode] == 'SLDA':
             print('SLDA mode')
             if self.alto.num_docs_labeled % 5 == 0 and self.alto.num_docs_labeled != 0:
                 print('num nums labeled is mod 5, updating the model')
                 with Manager() as manager:
-                    self.update_process = Process(target=self.update_slda)
+                    self.update_process = Process(target=self.update_slda, args=(user_id,))
                     self.update_process.start()        
                 
             else:
@@ -269,23 +264,31 @@ class User():
                     print('still updating model')
                 else:
                     print('SLDA model is updated')
-                    self.topics = self.model.print_topics(verbose=False)
-                    if USE_PROCESSED_TEXT:
-                        self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
+                    try:
+                        self.model = Topic_Model(num_topics, 0, model_types_map[self.mode], processed_doc_dir, training_length, {}, True, './Model/SLDA_user{}.pkl'.format(user_id))
+                        self.topics = self.model.print_topics(verbose=False)
+                        if USE_PROCESSED_TEXT:
+                            self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
 
-                    self.string_topics = {str(k): v for k, v in self.topics.items()}
-                    # print(self.string_topics)
-                    
-                    self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
-                    self.word_topic_distributions = self.model.get_word_topic_distribution()
-                    self.alto.update_doc_probs(self.document_probas, self.doc_topic_probas)
-                
+                        self.string_topics = {str(k): v for k, v in self.topics.items()}
+                        # print(self.string_topics)
+                        
+                        self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
+                        self.word_topic_distributions = self.model.get_word_topic_distribution()
+                        self.alto.update_doc_probs(self.document_probas, self.doc_topic_probas)
+                    except:
+                        pass
+            
+
+            # print('self topics are')
+            # print(self.topics)
             result = self.sub_roundtrip(label, doc_id, response_time)
             return result
         else:
             return self.sub_roundtrip(label, doc_id, response_time)
 
-    def get_document_topic_list(self):
+    def get_document_topic_list(self, recommend_action):
+        print('calling get document topic list')
         if self.mode == 1 or self.mode == 2 or self.mode == 3:
             document_probas = self.model.document_probas
             result = {}
@@ -297,10 +300,13 @@ class User():
             self.doc_topic_distribution = cluster
 
 
-            recommend_result = self.round_trip1('start', 13, "3")
             # print(recommend_result)
+            if recommend_action:
+                random_document, _ = self.alto.recommend_document(False)
+            else:
+                random_document = -1
 
-            result['document_id'] = recommend_result[4]['document_id']
+            result['document_id'] = random_document
             result['keywords'] = self.string_topics
             # random_document, _ = self.alto.recommend_document()
             # result['document_id'] = random_document
@@ -310,13 +316,48 @@ class User():
             cluster["1"] = list(range(len(self.df)))
             # print(cluster)
             result['cluster'] = cluster
-            recommend_result = self.round_trip1('start', 13, "3")
+            if recommend_action:
+                random_document, _ = self.alto.recommend_document(False)
+            else:
+                random_document = -1
             # print('recommend document')
             # print(recommend_result)
 
             # print('recommended result')
             # print(recommend_result)
-            result['document_id'] = recommend_result[4]['document_id']
+            result['document_id'] = random_document
+            result['keywords'] = {}
+            # random_document, _ = self.alto.recommend_document()
+            # result['document_id'] = random_document
+            # print('result')
+            # print(result)
+
+        return result
+    
+    def check_active_list(self):
+        print('calling check active list')
+        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+            document_probas = self.model.document_probas
+            result = {}
+            cluster = {}
+            for k, v in document_probas.items():
+                cluster[str(k)] = [ele[0] for ele in v]
+
+            result['cluster'] = cluster
+            self.doc_topic_distribution = cluster
+
+
+
+            result['keywords'] = self.string_topics
+            # random_document, _ = self.alto.recommend_document()
+            # result['document_id'] = random_document
+        else:
+            result = {}
+            cluster = {}
+            cluster["1"] = list(range(len(self.df)))
+            # print(cluster)
+            result['cluster'] = cluster
+     
             result['keywords'] = {}
             # random_document, _ = self.alto.recommend_document()
             # result['document_id'] = random_document

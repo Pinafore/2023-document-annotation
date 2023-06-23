@@ -138,7 +138,7 @@ def labelled_docs(labe, all_texts):
     return results
 
 def extract_label (name, number):
-    responses_path =("/static/responses/" + name + "/" + number +".xml" )
+    responses_path =("./static/responses/" + name + "/" + number +".xml" )
     doc = minidom.parse(responses_path)
     root = doc.getElementsByTagName("label")
     label = None

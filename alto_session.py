@@ -10,7 +10,7 @@ import pickle
 
 # This var means if True, when labeling the same doc, the next recommend doc would 
 # be the same
-switch_doc = True
+switch_doc = False
 
 # This variable means if you create a global classifier, then you predeciding there
 # are 20 topics in the classifier. Then test the accuracy of the global classifier
@@ -37,6 +37,7 @@ class NAITM():
         self.docs = documents
         self.num_docs_labeled = 0
         self.last_recommended_topic = None
+        self.last_recommended_doc_id = None
         self.recommended_doc_ids = set()
         self.text_vectorizer = text_vectorizer[0:train_len]
         
@@ -133,7 +134,13 @@ class NAITM():
     '''
     Preference function can be changed or chosen for NAITM
     '''
-    def preference(self):
+    def preference(self, update):
+        # print('last recommend docment is {}'.format(self.last_recommended_doc_id))
+        if not update and self.last_recommended_doc_id is not None:
+            # print('return last recommended id')
+            if self.last_recommended_doc_id in self.scores:
+                return self.last_recommended_doc_id, self.scores[self.last_recommended_doc_id]
+            return self.last_recommended_doc_id, -1
         if self.mode == 1:
             if len(self.classes) < 2:
                 # print('-----------')
@@ -172,6 +179,7 @@ class NAITM():
 
                 print('all recommended ids')
                 print(self.recommended_doc_ids)
+                self.last_recommended_doc_id = self.doc_probs[max_topic_idx][0][0]
                 return self.doc_probs[max_topic_idx][0][0], -1
             else:
                 if use_min:
@@ -202,6 +210,7 @@ class NAITM():
                 print('Classifier in progess...')
                 print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[chosen_idx]))
                 self.recommended_doc_ids.add(chosen_idx)
+                self.last_recommended_doc_id = chosen_idx
                 return chosen_idx, self.scores[chosen_idx]
         else:
             if len(self.classes) < 2:
@@ -209,8 +218,13 @@ class NAITM():
                 # print('num classes smaller than 2')
                 # print('-----------')
                 # print('median pro is {}'.format(self.median_pro))
-                random_doc_id = random.randint(0, self.train_length)
+                
+                if self.last_recommended_doc_id is None:
+                    random_doc_id = self.train_length//2
+                else:
+                    random_doc_id = self.last_recommended_doc_id - 1
 
+                self.last_recommended_doc_id = random_doc_id
                 return random_doc_id, -1
             else:
                 # print('-----------')
@@ -245,11 +259,12 @@ class NAITM():
                 print('Classifier in progess...')
                 print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[chosen_idx]))
                 self.recommended_doc_ids.add(chosen_idx)
+                self.last_recommended_doc_id = chosen_idx
                 return chosen_idx, self.scores[chosen_idx]
 
 
-    def recommend_document(self):
-        document_id, score = self.preference()
+    def recommend_document(self, update):
+        document_id, score = self.preference(update)
         print(self.classes)
         return document_id, score
 
@@ -389,7 +404,7 @@ class NAITM():
             
             return result
         else:
-            return "Create at least two labels to start active learning"
+            return "Model suggestion starts after two distinct labels are created two labels to start active learning"
         
     def eval_classifier(self):
         local_training_preds = self.classifier.predict(self.documents_track)

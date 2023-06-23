@@ -29,6 +29,7 @@ viewButtons.forEach((btn, index) => {
 
 function highlighWords(words) {
     var text = original_text;
+    console.log(words)
     words.forEach((word) => {
       if (word.length>2){
         const pattern = new RegExp(word, "gi");
@@ -42,7 +43,33 @@ function highlighWords(words) {
     });
   }
 
-
+  const select = document.querySelector(".suggestion");
+  const label = document.querySelector(".text_input");
+  const submitButton = document.querySelector("#myBtn");
+  console.log({ select, submitButton });
+  
+  submitButton.disabled = true;
+  
+  let selectValue;
+  let labelValue;
+  
+  select.addEventListener("change", (e) => {
+    selectValue = e.target.value;
+    checkButtonEnabled();
+  });
+  
+  label.addEventListener("change", (e) => {
+    labelValue = e.target.value;
+    checkButtonEnabled();
+  });
+  
+  function checkButtonEnabled() {
+    if (selectValue && labelValue) {
+      submitButton.disabled = true;
+    } else if (selectValue || labelValue) {
+      submitButton.disabled = false;
+    }
+  }
 
   // function openForm() {
   //   document.getElementById("loginPopup").style.display = "block";
@@ -89,33 +116,7 @@ function highlighWords(words) {
   
 
 
-const select = document.querySelector(".suggestion");
-const label = document.querySelector(".text_input");
-const submitButton = document.querySelector("#myBtn");
-console.log({ select, submitButton });
 
-submitButton.disabled = true;
-
-let selectValue;
-let labelValue;
-
-select.addEventListener("change", (e) => {
-  selectValue = e.target.value;
-  checkButtonEnabled();
-});
-
-label.addEventListener("change", (e) => {
-  labelValue = e.target.value;
-  checkButtonEnabled();
-});
-
-function checkButtonEnabled() {
-  if (selectValue && labelValue) {
-    submitButton.disabled = true;
-  } else if (selectValue || labelValue) {
-    submitButton.disabled = false;
-  }
-}
 
 
 

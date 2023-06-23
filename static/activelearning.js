@@ -18,10 +18,13 @@ label.addEventListener("change", (e) => {
   checkButtonEnabled();
 });
 
+
 function checkButtonEnabled() {
   if (selectValue && labelValue) {
     submitButton.disabled = true;
-  } else if (selectValue || labelValue) {
+  } 
+  else if (selectValue || labelValue) {
     submitButton.disabled = false;
   }
 }
+
