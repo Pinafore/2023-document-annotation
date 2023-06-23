@@ -28,8 +28,9 @@ REGRESSOR_PREDICT = False
 
 
 class User():
-    def __init__(self, mode):
+    def __init__(self, mode, user_id):
         self.mode = mode
+        self.user_id = user_id
         self.df = pd.read_json(doc_dir)
         self.raw_texts = self.df.text.values.tolist()
         self.test_df = None
@@ -122,36 +123,13 @@ class User():
             else:
                 result['prediction'] ='Model suggestion starts after two distinct labels are created 2 labels to start model suggestion'
 
-            # if len(self.user_labels) < 2:
-            #     self.user_labels.add(label)
-            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
-            # else:
-            #     result['prediction'] = random.sample(self.user_labels, 1)[0]
-                
-            
-            # print(result)
-            # print('unique user labels length is {}'.format(len(self.user_labels)))
-            # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
-            #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
-            #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-            # print(result)
             return result
         elif self.mode ==0:
-            # if len(self.user_labels) < 2:
-            #     self.user_labels.add(label)
-            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
-            # else:
-            #     result['prediction'] = random.sample(self.user_labels, 1)[0]
             result['prediction'] = self.alto.predict_label(int(doc_id))
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics
             result['topic_order'] = {}
-            # print('unique user labels length is {}'.format(len(self.user_labels)))
-            # if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
-            #     local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
-            #     return local_training_acc, local_testing_preds, global_training_acc, global_testing_acc, result
-            # print('result is ...')
-            # print(result)
+
             return result
 
     def sub_roundtrip(self, label, doc_id, response_time):
@@ -188,19 +166,6 @@ class User():
             # result['raw_text'] = self.raw_texts[random_document]
             # result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
-            # topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
-            # result['topic_order'] = topic_distibution
-            # # result['topic_keywords'] = topic_keywords
-            # result['topic'] = self.model.get_word_span_prob(random_document, topic_res_num, 0.001)
-
-                
-            # result['prediction'] = self.alto.predict_label(random_document)
-
-            # if len(self.user_labels) < 2:
-            #     self.user_labels.add(label)
-            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
-            # else:
-            #     result['prediction'] = random.sample(self.user_labels, 1)[0]
                     
                 
             # print(result)
@@ -222,17 +187,6 @@ class User():
             # result['raw_text'] = str(random_document)
             result['document_id'] = str(random_document)
 
-            # result['prediction'] = self.alto.predict_label(int(random_document))
-
-            # if len(self.user_labels) < 2:
-            #     self.user_labels.add(label)
-            #     result['prediction'] = "Model suggestion starts after two distinct labels are created two labels to start active learning"
-            # else:
-            #     result['prediction'] = random.sample(self.user_labels, 1)[0]
-
-            # topics = {"1": {"spans": [], "keywords": []}}
-            # result['topic'] = topics
-            # result['topic_order'] = {}
             print('unique user labels length is {}'.format(len(self.user_labels)))
             if len(self.user_labels) >= 2 and REGRESSOR_PREDICT:
                 local_training_acc, local_testing_preds, global_training_acc, global_testing_acc = self.alto.eval_classifier()
@@ -245,18 +199,47 @@ class User():
         else:
             return -1, -1, -1, -1, result
 
-    def update_slda(self, user_id):
-        model = Topic_Model(num_topics, 2500, model_types_map[self.mode], processed_doc_dir, training_length, self.alto.user_labels, False, None)
-        model.train('./Model/SLDA_user{}.pkl'.format(user_id))
+    def get_doc_information_to_save(self, doc_id):
+        result = dict()
+        print('getting document information to save...')
+        print('mode is ', self.mode)
+        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+            # result['raw_text'] = self.raw_texts[random_document]
+            topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
+            result['topic_order'] = topic_distibution
+            # result['topic_keywords'] = topic_keywords
+            result['topics'] = topic_res_num
 
-    def round_trip1(self, label, doc_id, response_time, user_id):
+            if len(self.user_labels) >= 2:
+                result['prediction'] = self.alto.predict_label(int(doc_id))
+            else:
+                result['prediction'] ='No prediction'
+
+            return result
+        elif self.mode ==0:
+            if len(self.user_labels) >= 2:
+                result['prediction'] = self.alto.predict_label(int(doc_id))
+            else:
+                result['prediction'] ='No prediction'
+
+            
+            result['topics'] = {}
+            result['topic_order'] = {}
+       
+            return result
+
+    def update_slda(self):
+        model = Topic_Model(num_topics, 2500, model_types_map[self.mode], processed_doc_dir, training_length, self.alto.user_labels, False, None)
+        model.train('./Model/SLDA_user{}.pkl'.format(self.user_id))
+
+    def round_trip1(self, label, doc_id, response_time):
         print('calling round trip')
         if model_types_map[self.mode] == 'SLDA':
             print('SLDA mode')
             if self.alto.num_docs_labeled % 5 == 0 and self.alto.num_docs_labeled != 0:
                 print('num nums labeled is mod 5, updating the model')
                 with Manager() as manager:
-                    self.update_process = Process(target=self.update_slda, args=(user_id,))
+                    self.update_process = Process(target=self.update_slda)
                     self.update_process.start()        
                 
             else:
@@ -265,7 +248,7 @@ class User():
                 else:
                     print('SLDA model is updated')
                     try:
-                        self.model = Topic_Model(num_topics, 0, model_types_map[self.mode], processed_doc_dir, training_length, {}, True, './Model/SLDA_user{}.pkl'.format(user_id))
+                        self.model = Topic_Model(num_topics, 0, model_types_map[self.mode], processed_doc_dir, training_length, {}, True, './Model/SLDA_user{}.pkl'.format(self.user_id))
                         self.topics = self.model.print_topics(verbose=False)
                         if USE_PROCESSED_TEXT:
                             self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))

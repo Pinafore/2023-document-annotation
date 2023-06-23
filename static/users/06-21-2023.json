@@ -1,0 +1,152 @@
+{
+    "zongxia-active": {
+        "username": "zongxia-active",
+        "id": 1,
+        "labels": ",electronics,drugs,immigrants,judicial,climate change,privacy,electronics,weapon,veteran",
+        "labelled_document": ",129,128,183,0,118,127,216,212,74"
+    },
+    "zongxia-LDA": {
+        "username": "zongxia-LDA",
+        "id": 2,
+        "labels": ",state department,state department,education,veteran health",
+        "labelled_document": ",230,72,145,201"
+    },
+    "zongxia-SLDA": {
+        "username": "zongxia-SLDA",
+        "id": 3,
+        "labels": ",land use,veteran health,employee health,employee health,employee jurisdiction,immigrant status,immigrant status,spouse,agriculture development,assistance program,veteran health",
+        "labelled_document": ",188,201,78,40,53,56,187,248,13,20,175"
+    },
+    "zongxia-ETM": {
+        "username": "zongxia-ETM",
+        "id": 4,
+        "labels": ",business,health care,juridicial regulations,juridicial regulations,water rights,health care,research,human rights,publics,health care,immigration,health care,immigration",
+        "labelled_document": ",102,14,132,92,50,52,232,164,137,257,157,155,219"
+    },
+    "z-active": {
+        "username": "z-active",
+        "id": 5,
+        "labels": ",funds",
+        "labelled_document": ",129"
+    },
+    "z-LDA": {
+        "username": "z-LDA",
+        "id": 6,
+        "labels": ",state department",
+        "labelled_document": ",230"
+    },
+    "z-SLDA": {
+        "username": "z-SLDA",
+        "id": 7,
+        "labels": ",land ecosystem,land ecosystem,land infrastructure,water infrastructure,transportation infrastructure,transportation infrastructure,water infrastructure,water infrastructure,tax exemption,tax exemption,tax exemption,tax exemption,domestic violence,land ecosystem,water infrastructure,water infrastructure,wild fire,education research,education research",
+        "labelled_document": ",188,144,220,125,22,203,192,211,229,254,158,241,75,77,50,226,207,105,43"
+    },
+    "z-ETM": {
+        "username": "z-ETM",
+        "id": 8,
+        "labels": ",bill transfer,bill transfer,transfer,business,government authorities,land ecosystem,human rights,health research,water infrastructure,protection,protection,protection",
+        "labelled_document": ",45,38,211,54,109,188,68,208,50,238,150,55"
+    },
+    "z-active1": {
+        "username": "z-active1",
+        "id": 9,
+        "labels": "",
+        "labelled_document": ""
+    },
+    "a-LDA1": {
+        "username": "a-LDA1",
+        "id": 10,
+        "labels": "",
+        "labelled_document": ""
+    },
+    "z-SLDA1": {
+        "username": "z-SLDA1",
+        "id": 11,
+        "labels": "",
+        "labelled_document": ""
+    },
+    "z-ETM1": {
+        "username": "z-ETM1",
+        "id": 12,
+        "labels": ",wage,veteran health,wage,environment,civil rights,policy",
+        "labelled_document": ",53,126,93,186,49,23"
+    },
+    "Emily.W": {
+        "username": "Emily.W",
+        "id": 13,
+        "labels": ",test,test,test 2,test 2,test,covid,safety,fda,technology,climate,climate,climate,climate",
+        "labelled_document": ",129,128,127,136,211,8,196,14,176,118,152,207,237"
+    },
+    "MariaD": {
+        "username": "MariaD",
+        "id": 14,
+        "labels": ",ocean,climate,veterans,child,child,k12,veterans,budget",
+        "labelled_document": ",105,72,201,160,67,215,69,1"
+    },
+    "daniel3": {
+        "username": "daniel3",
+        "id": 15,
+        "labels": "",
+        "labelled_document": ""
+    },
+    "Kelly Anderson": {
+        "username": "Kelly Anderson",
+        "id": 16,
+        "labels": ",institution,healthcare,advocacy",
+        "labelled_document": ",95,126,93"
+    },
+    "Azin": {
+        "username": "Azin",
+        "id": 17,
+        "labels": ",electronics industry,tax-exempt nonprofit drug manufacturer",
+        "labelled_document": ",129,128"
+    },
+    "tasnim": {
+        "username": "tasnim",
+        "id": 18,
+        "labels": ",resilience,incentive,veteran,\"community resilience\",immigration,healthcare,healthcare,healthcare,radiation,toxic material,immigration,healthcare,immigration,\"community resilience\",immigration,healthcare,parental leave care,international affair",
+        "labelled_document": ",58,72,201,215,183,100,69,126,108,159,238,223,25,106,5,250,91,222"
+    },
+    "Jennifer": {
+        "username": "Jennifer",
+        "id": 19,
+        "labels": ",natural system,public,infrastructure,travel program,clean vehicle",
+        "labelled_document": ",188,144,125,22,203"
+    },
+    "jarrod": {
+        "username": "jarrod",
+        "id": 20,
+        "labels": ",tribal lands,veterans affairs,workplace harassment,federal buildings,age discrimination,dhs facilities,student loans,mental health,war powers act,irs,corruption,libya,immigration,border wall,fire fighter,war powers act,department of defense,immigration,foreign agents,tribal health,veterans affairs,paycheck protection program",
+        "labelled_document": ",144,126,93,186,49,23,249,98,0,90,251,181,114,202,250,101,152,103,21,86,25,139"
+    },
+    "Donghwan": {
+        "username": "Donghwan",
+        "id": 21,
+        "labels": ",electronics supply chain fund,public health,immigration,budget reduction,climate,online privacy,regulation",
+        "labelled_document": ",129,128,183,182,118,127,45"
+    },
+    "Jordan": {
+        "username": "Jordan",
+        "id": 22,
+        "labels": ",health",
+        "labelled_document": ",231"
+    },
+    "tansim": {
+        "username": "tansim",
+        "id": 23,
+        "labels": "",
+        "labelled_document": ""
+    },
+    "juan": {
+        "username": "juan",
+        "id": 24,
+        "labels": ",labor,health care",
+        "labelled_document": ",53,126"
+    },
+    "danielz": {
+        "username": "danielz",
+        "id": 25,
+        "labels": ",daniel,dofi",
+        "labelled_document": ",129,128"
+    }
+}

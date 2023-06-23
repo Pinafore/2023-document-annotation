@@ -16,7 +16,7 @@ true_labels = list(all_texts['label'].values())
 DATABASE = './database/local_users.db'
 DATABASE = './database/server_users.db'
 DATABASE = './database/beta_testing.db'
-DATABASE = './database/06_21_2023.db'
+DATABASE = './database/06_23_2023_test.db'
 user_instances = {}
 MODES = [0, 1, 2, 3]
 # MODES = [1, 1, 1, 1]
@@ -46,6 +46,7 @@ def init_db():
                      global_training_acc REAL,
                      local_testing_acc REAL,
                      global_testing_acc REAL,
+                     topic_information TEXT,
                      FOREIGN KEY (user_id) REFERENCES users (id));''')
     conn.close()
 
@@ -68,7 +69,7 @@ def create_user():
         cursor.execute('SELECT last_insert_rowid()')
         result = cursor.fetchone()
         user_id = result[0]
-        user_instances[user_id] = User(mode)  # Create the User() object and store it in the user_instances dictionary
+        user_instances[user_id] = User(mode, user_id)  # Create the User() object and store it in the user_instances dictionary
     
     print('creating user ', user_id)
     return {'user_id': user_id, 'code': 200, 'msg': 'User created'}
@@ -90,12 +91,13 @@ def nist_recommend(user_id, label, doc_id, response_time):
     if row:
         mode = row[0]
         user =  user_instances[user_id]
-        ltr, lte, gtr, gte, result = user.round_trip1(label, doc_id, response_time, user_id)
-
+        ltr, lte, gtr, gte, result = user.round_trip1(label, doc_id, response_time)
+        document_topics = user.get_doc_information_to_save(doc_id)
+        document_topics = json.dumps(document_topics)
         # Save the label, doc_id, and response_time for the current user_id
 
-        conn.execute('INSERT INTO recommendations (user_id, label, doc_id, response_time, actual_label, local_training_acc, local_testing_acc, global_training_acc, global_testing_acc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                     (user_id, label, doc_id, response_time, actual_label, ltr, lte, gtr, gte))
+        conn.execute('INSERT INTO recommendations (user_id, label, doc_id, response_time, actual_label, local_training_acc, local_testing_acc, global_training_acc, global_testing_acc, topic_information) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                     (user_id, label, doc_id, response_time, actual_label, ltr, lte, gtr, gte, document_topics))
         conn.commit()
 
         result['code'] = 200

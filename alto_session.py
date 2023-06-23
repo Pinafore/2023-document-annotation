@@ -396,9 +396,11 @@ class NAITM():
         doc_id = int(doc_id)
         # print('user_label_number_map is {}'.format(self.user_label_number_map))
         if len(self.classes) >= 2:
-            # print('predicting')
+            print(self.classifier.predict_proba(self.text_vectorizer[doc_id])[0])
+            print(self.classifier.classes_)
+            
             result = self.classifier.predict(self.text_vectorizer[doc_id])[0]
-            # print('all predictions are {}'.format(result))
+            
             # print('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
             print('prediction result is {}'.format(result))
             
