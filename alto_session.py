@@ -396,17 +396,22 @@ class NAITM():
         doc_id = int(doc_id)
         # print('user_label_number_map is {}'.format(self.user_label_number_map))
         if len(self.classes) >= 2:
-            print(self.classifier.predict_proba(self.text_vectorizer[doc_id])[0])
-            print(self.classifier.classes_)
-            
-            result = self.classifier.predict(self.text_vectorizer[doc_id])[0]
-            
+            classes = self.classifier.classes_
+            probabilities = self.classifier.predict_proba(self.text_vectorizer[doc_id])[0]
+            top_three_indices = probabilities.argsort()[::-1][:3]
+
+            # result = self.classifier.predict(self.text_vectorizer[doc_id])[0]
+            result = []
+            for ele in top_three_indices:
+                # result += classes[ele] + '    Confidence: ' + str(round(probabilities[ele], 2)) + '\n'
+                result.append(classes[ele] + '    Confidence: (' + str(round(probabilities[ele]*100, 4)) + '%)')
+
             # print('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
             print('prediction result is {}'.format(result))
             
             return result
         else:
-            return "Model suggestion starts after two distinct labels are created two labels to start active learning"
+            return ["Model suggestion starts after two distinct labels are created two labels to start active learning"]
         
     def eval_classifier(self):
         local_training_preds = self.classifier.predict(self.documents_track)

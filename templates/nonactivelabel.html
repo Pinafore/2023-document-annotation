@@ -48,7 +48,10 @@
             {{text}}
         </div>
         <br>
-        <div> Model Suggestion: <span style="font-size: larger; font-weight: 500;">{{pred}}</span></div>
+        <!-- <div> Model Suggestion: <span style="font-size: larger; font-weight: 500;">{{pred}}</span></div> -->
+        {% for suggestion in pred %}
+          <div> Top Model Suggestion {{ loop.index }}: <span style="font-size: larger; font-weight: 500;">{{suggestion}}</span></div>
+        {% endfor %}
         <form method="POST">
             <div name="responses">
               <select class="suggestion" name="suggestion">

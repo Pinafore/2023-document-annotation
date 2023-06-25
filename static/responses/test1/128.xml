@@ -3,6 +3,6 @@
 	<name name="test1"/>
 	<response_time response_time="0:00:05"/>
 	<document_id document_id="128"/>
-	<label label="expand"/>
-	<user_id user_id="1"/>
+	<label label="drugs"/>
+	<user_id user_id="16"/>
 </root>

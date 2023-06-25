@@ -17,7 +17,6 @@ num_iter = 1200
 load_data = True
 save_model = False
 load_model_path = './Model/{}_model_data.pkl'
-# num_topics = 20
 num_topics =20
 inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
@@ -119,9 +118,9 @@ class User():
             result['topic'] = self.model.get_word_span_prob(int(doc_id), topic_res_num, 0.001)
 
             if len(self.user_labels) >= 2:
-                result['prediction'] = self.alto.predict_label(int(doc_id))
+                result['prediction'] = self.alto.(int(doc_id))
             else:
-                result['prediction'] ='Model suggestion starts after two distinct labels are created 2 labels to start model suggestion'
+                result['prediction'] = ['Model suggestion starts after two distinct labels are created 2 labels to start model suggestion']
 
             return result
         elif self.mode ==0:
@@ -213,14 +212,14 @@ class User():
             if len(self.user_labels) >= 2:
                 result['prediction'] = self.alto.predict_label(int(doc_id))
             else:
-                result['prediction'] ='No prediction'
+                result['prediction'] =['No prediction']
 
             return result
         elif self.mode ==0:
             if len(self.user_labels) >= 2:
                 result['prediction'] = self.alto.predict_label(int(doc_id))
             else:
-                result['prediction'] ='No prediction'
+                result['prediction'] =['No prediction']
 
             
             result['topics'] = {}
