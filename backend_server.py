@@ -22,8 +22,9 @@ inference_alg = 'logreg'
 test_dataset_name = './Data/newsgroup_sub_1000.json'
 USE_TEST_DATA = False
 USE_PROCESSED_TEXT = False
-training_length = 258
-REGRESSOR_PREDICT = False
+CONCATENATE_KEYWORDS = True
+training_length = 500
+REGRESSOR_PREDICT = True
 
 
 class User():
@@ -31,7 +32,7 @@ class User():
         self.mode = mode
         self.user_id = user_id
         self.df = pd.read_json(doc_dir)
-        self.raw_texts = self.df.text.values.tolist()
+        self.raw_texts = self.df.text.values.tolist()[0:training_length]
         self.test_df = None
         self.vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,2))
         
@@ -56,17 +57,14 @@ class User():
 
         if mode != 0:
             if mode == 1 or mode == 2:
-                # self.model = TopicModel(corpus_path=doc_dir, model_type=model_types_map[mode], min_num_topics= 5, num_iters= num_iter, load_model=load_data, save_model= save_model, load_path=load_model_path.format(model_types_map[mode]), hypers = None)
-                # self.model.preprocess(5, 100)
-
-                # self.model.train(num_topics)
-                # num_topics, num_iters, model_type, load_data_path, train_len, user_labels, load_model, model_path
-                # self.model = TopicModel('./Model/{}_{}.pkl'.format(model_types_map[mode], num_topics), model_types_map[mode], doc_dir, num_topics)
                 self.update_process = None
                 self.model = Topic_Model(num_topics, 0, model_types_map[mode], processed_doc_dir, training_length, {}, True, './Model/{}_{}.pkl'.format(model_types_map[mode], num_topics))
                 self.topics = self.model.print_topics(verbose=False)
                 if USE_PROCESSED_TEXT:
                     self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
+
+                if CONCATENATE_KEYWORDS:
+                    self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords_raw(self.topics, self.raw_texts))
 
                 self.string_topics = {str(k): v for k, v in self.topics.items()}
                 # print(self.string_topics)
@@ -87,6 +85,10 @@ class User():
                 if USE_PROCESSED_TEXT:
                     self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords(self.topics, self.processed_test_data))
 
+                if CONCATENATE_KEYWORDS:
+                    self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords_raw(self.topics, self.raw_texts))
+
+
                 self.string_topics = {str(k): v for k, v in self.topics.items()}
                 # print(self.string_topics)
                 self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
@@ -102,7 +104,7 @@ class User():
                 data_to_transform = [' '.join(doc) for doc in datawords_nonstop]
                 self.vectorizer_idf = self.vectorizer.fit_transform(data_to_transform)
 
-              
+            
             self.alto = NAITM(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df)
 
     def get_doc_information(self, doc_id):
@@ -118,7 +120,7 @@ class User():
             result['topic'] = self.model.get_word_span_prob(int(doc_id), topic_res_num, 0.001)
 
             if len(self.user_labels) >= 2:
-                result['prediction'] = self.alto.(int(doc_id))
+                result['prediction'] = self.alto.predict_label(int(doc_id))
             else:
                 result['prediction'] = ['Model suggestion starts after two distinct labels are created 2 labels to start model suggestion']
 
@@ -257,6 +259,11 @@ class User():
                         
                         self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                         self.word_topic_distributions = self.model.get_word_topic_distribution()
+
+                        if CONCATENATE_KEYWORDS:
+                            self.vectorizer_idf = self.vectorizer.fit_transform(self.model.concatenate_keywords_raw(self.topics, self.raw_texts))
+                            self.alto.update_text_vectorizer(self.vectorizer_idf)
+
                         self.alto.update_doc_probs(self.document_probas, self.doc_topic_probas)
                     except:
                         pass

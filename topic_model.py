@@ -2,9 +2,8 @@ import tomotopy as tp
 from tomotopy.utils import Corpus
 from gensim.utils import simple_preprocess
 import pickle
-import os
-import re
-import argparse
+from gensim.models import CoherenceModel
+from gensim.corpora import Dictionary
 
 
 import numpy as np
@@ -25,6 +24,7 @@ class Topic_Model():
             self.user_labels = user_labels
             self.doc_topic_probas = None
             self.doc_topic_probas = None
+            self.data_words_nonstop = None
         else:
             with open(model_path, 'rb') as inp:
                 self.loaded_data = pickle.load(inp)
@@ -55,6 +55,7 @@ class Topic_Model():
 
     
         datawords_nonstop = saved_data['datawords_nonstop']
+        self.data_words_nonstop = datawords_nonstop
         spans = saved_data['spans']
 
         corpus = Corpus()
@@ -102,23 +103,6 @@ class Topic_Model():
                 else:
                     corpus.add_doc(ngrams, y=null_y)
 
-                # if i >=100:
-                #     corpus.add_doc(ngrams, y=[np.nan])
-                # elif i >100 and i <= 300:
-                #     corpus.add_doc(ngrams,y=[1])
-                # else:
-                #     corpus.add_doc(ngrams,y=[0])
-                # y = [0 for _ in range(len(label_set))]
-                
-                # # y = [3 for i in range(20)]
-                # if labels and not labels[i] == 'None':
-                #     label = labels[i]
-                #     y[label_dict[label]] = 1
-                #     corpus.add_doc(ngrams, y=y)
-                #     # print(y)
-                # else:
-                #     corpus.add_doc(ngrams, y=null_y)
-                            
         else:
             raise Exception("unsupported model type!")
 
@@ -131,19 +115,20 @@ class Topic_Model():
             # 'min_cf': 2, 'min_df': 4, 'iterations': 145, 'var': 'l', 'glm_param': 5.252727047556928, 
             # 'nu_sq': 6.7920065058884145}
 
-            min_cf = 2; min_df = 4
+            # min_cf = 2; min_df = 4
             var_param = ['l' for i in range(len(user_label_set))]
             # nu_sq = [6.79]
             # glm_param = [5.25]
-            alpha = 0.1; eta = 0.01
+            # alpha = 0.1; eta = 0.01
             nu_sq = [5 for i in range(len(user_label_set))]
             glm_param = [1.1 for i in range(len(user_label_set))]
-            mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, nu_sq=nu_sq,glm_param=glm_param)
+            # mdl = tp.SLDAModel(k=self.num_topics, vars=var_param, nu_sq=nu_sq,glm_param=glm_param)
+            mdl = tp.SLDAModel(k=self.num_topics, vars=var_param)
                     
         elif self.model_type == 'LDA':
             print('Created LDA model')
             # Best hyperparameters: {'alpha': 0.1, 'eta': 1.0, 'min_cf': 4, 'min_df': 5, 'iterations': 173}
-            self.num_iters = 1730
+            # self.num_iters = 1730
             # mdl = tp.LDAModel(k=self.num_topics, alpha =0.05, eta=0.1, min_cf=4, min_df=5)
             mdl = tp.LDAModel(k=self.num_topics, alpha =0.05, eta=0.1)
 
@@ -157,18 +142,16 @@ class Topic_Model():
             mdl.train(10)
             print(f'Iteration: {i}, Log-likelihood: {mdl.ll_per_word}, Perplexity: {mdl.perplexity}')
         # mdl.train(self.num_iters)
-        self.lda_model = mdl
+        self.model = mdl
         # print('length of corups is {}'.format(len(corpus)))
 
         assert len(corpus) == len(saved_data['texts'])
        
 
         # Instantiate a coherence model with the topic-word distribution, the corpus, and the dictionary
-        coherence_model = tp.coherence.Coherence(
-            corpus=mdl, coherence="c_v", top_n=10
-        )
+        coherence_score = self.get_coherence()
 
-        print(coherence_model.get_score())
+        print(coherence_score)
         '''
         Make documents for normal LDA
         '''
@@ -203,9 +186,9 @@ class Topic_Model():
             doc_to_topics, topics_probs = {}, {}
             for doc_id, doc in enumerate(self.maked_docs[0:self.train_length]):
                 # if self.model_type == 'SLDA':
-                #     inferred = self.lda_model.estimate(doc)
+                #     inferred = self.model.estimate(doc)
                 # else:
-                inferred, _ = self.lda_model.infer(doc)
+                inferred, _ = self.model.infer(doc)
 
                 doc_topics = list(enumerate(inferred))
                 doc_prob_topic.append(inferred)
@@ -253,8 +236,23 @@ class Topic_Model():
         
         return out_topics
     
-    # def group_docs_to_topics(self):
-    #     return self.document_probas, self.doc_topic_probas
+    def get_coherence(self):
+        dictionary = Dictionary(self.data_words_nonstop)
+        model_keywords = self.print_topics()
+
+        keywords = []
+        for k, v in model_keywords.items():
+            keywords.append(v)
+
+        coherence_model = CoherenceModel(
+        topics=keywords,
+        texts=self.data_words_nonstop,
+        dictionary=dictionary,
+        coherence='c_v'
+        )
+
+        coherence_score = coherence_model.get_coherence()
+        return coherence_score
     
     def get_word_topic_distribution(self):
         '''
@@ -365,4 +363,17 @@ class Topic_Model():
                 res_ele = ' '.join(doc)
                 result.append(res_ele)
                 
+        return result
+    
+    # concatenate the keywords with raw texts
+    def concatenate_keywords_raw(self, topic_keywords, raw_texts):
+        result = []
+
+        for i, doc in enumerate(raw_texts):
+            topic_idx = np.argmax(self.doc_topic_probas[i])
+            keywords = topic_keywords[topic_idx]
+            keywords_str = ' '.join(keywords)
+            res_ele = doc + ' ' + keywords_str
+            result.append(res_ele)
+        
         return result

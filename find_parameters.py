@@ -1,240 +1,66 @@
+import subprocess
+import pickle
 import tomotopy as tp
-import itertools
-import numpy as np
-import pickle 
+from gensim.models import CoherenceModel
+from gensim.corpora import Dictionary
+import subprocess
 import tomotopy as tp
-import numpy as np
-from gensim.corpora.dictionary import Dictionary
-from gensim.models.coherencemodel import CoherenceModel
-from skopt import gp_minimize
-from skopt.space import Real, Integer, Categorical
-from skopt.utils import use_named_args
-from tomotopy.utils import Corpus
-import argparse
+from topic_model import Topic_Model
+from Neural_Topic_Model import Neural_Model
 
-def calculate_perplexity(model):
-    return model.perplexity
 
-def calculate_coherence(model):
-    coherence_model = tp.coherence.Coherence(
-            corpus=model, coherence="c_v", top_n=10
-        )
+def determine_best_lda_params(model_type):
+    coherences = []
+    doc_dir = './Data/newsgroup_sub_500_processed.pkl'
+    for num_topics in range(5, 50):
+        train_len = 500
+        
+        best_coherence_score = -1
+        best_num_iters = -1
+        
+        num_iters_list = [1000, 1500, 2000, 2500, 3000, 3500, 4000]
+        
+        for num_iters in num_iters_list:
+            # Call the command-line program to create the classical LDA model
+            if model_type == 'LDA' or model_type == 'SLDA':
+                result = subprocess.run(["python", "create_classical_model.py",
+                                        "--num_topics", str(num_topics),
+                                        "--train_len", str(train_len),
+                                        "--num_iters", str(num_iters),
+                                        "--model_type", model_type,
+                                        "--load_data_path", doc_dir],
+                                        capture_output=True, text=True)
+            elif model_type == 'ETM':
+                result = subprocess.run(["python", "neural_topic.py",
+                                        "--num_topics", str(num_topics),
+                                        "--train_len", str(train_len),
+                                        "--num_iters", str(num_iters),
+                                        "--model_type", model_type,
+                                        "--load_data_path", doc_dir],
+                                        capture_output=True, text=True)
+            
+            # Load the trained LDA model
+            if model_type == 'LDA' or model_type == 'SLDA':
+                model = Topic_Model(num_topics, 0, model_type, doc_dir, train_len, {}, True, './Model/{}_{}.pkl'.format(model_type, num_topics))
+            elif model_type == 'SLDA':
+                model = Topic_Model(num_topics, 0, model_type, doc_dir, train_len, {}, True, './Model/{}_{}.pkl'.format(model_type, num_topics))
+            elif model_type == 'ETM':
+                model = Neural_Model('./Model/ETM_{}.pkl'.format(num_topics), doc_dir, doc_dir)
+            
+            # Compute coherence score
+            # coherence_model = tp.coherence.Coherence(corpus=model, coherence="c_v", top_n=20)
+            # coherence_score = coherence_model.get_score()
+            
+            coherence_score = model.get_coherence()
+            print('Number of topics: {}, Number of iterations: {}, Coherence score: {}'.format(num_topics, num_iters, coherence_score))
+
+            if coherence_score > best_coherence_score:
+                best_coherence_score = coherence_score
+                best_num_iters = num_iters
+        
+        coherences.append((num_topics, best_num_iters, best_coherence_score))
     
-    return coherence_model.get_score()
+    return coherences
 
-def train_lda_model(alpha, eta, k, corpus, iterations):
-    model = tp.LDAModel(alpha=alpha, eta=eta, k=k)
-    model.add_corpus(corpus)
-    
-    for _ in range(iterations):
-        model.train(10)
-    
-    return model
-
-def train_supervised_lda_model(alpha, eta, k, min_cf, min_df, vars, glm_param, nu_sq, corpus, iterations):
-    model = tp.SLDAModel(alpha=alpha, eta=eta, k=k, min_cf=min_cf, min_df=min_df, vars=vars, glm_param=glm_param, nu_sq=nu_sq)
-    model.add_corpus(corpus)
-    for i in range(iterations):
-        # model.train(10, workers=4)
-        if i % 50 == 0:
-            print(i)
-        model.train(10)
-    
-    return model
-
-def build_corpus(path, model_type):
-    # Perform the random search
-    with open(path, 'rb') as inp:
-        loaded_data = pickle.load(inp)
-
-    corpus, labels = loaded_data['datawords_nonstop'], loaded_data['labels']
-    
-    result_corpus = tp.utils.Corpus()
-    if model_type =='SLDA':
-        label_set = np.unique(labels)
-        label_dict = dict()
-        for i,label in enumerate(label_set):
-            label_dict[label] = i
-        for i, ngrams in enumerate(corpus):
-            y = [0 for _ in range(len(label_set))]
-            null_y = [np.nan for _ in range(len(label_set))]
-            # y = [3 for i in range(20)]
-            if labels and not labels[i] == 'None':
-                label = labels[i]
-                y[label_dict[label]] = 1
-                result_corpus.add_doc(ngrams, y=y)
-                # print(y)
-            else:
-                result_corpus.add_doc(ngrams, y=null_y)
-            # result_corpus.add_doc(ngrams, labels= labels[i])
-    else: 
-        for i, ngrams in enumerate(corpus):
-            result_corpus.add_doc(ngrams)
-    return result_corpus
-
-
-
-def normalize(value, min_value, max_value):
-    return (value - min_value) / (max_value - min_value)
-
-
-
-def objective(params, corpus, min_perplexity, max_perplexity, min_coherence, max_coherence, perplexity_weight, coherence_weight, model_type):
-    # alpha, eta, k, min_cf, min_df, iterations = params
-    # k = 20
-    if model_type == 'LDA':
-        alpha, eta, iterations, k = params
-
-        # print('alpha is {}, eta is {}'.format(alpha, eta))
-        model = train_lda_model(alpha, eta, k, corpus, iterations)
-    elif model_type =='SLDA':
-        # print('getting into objective')
-        alpha, eta, min_cf, min_df, iterations, var_type, glm_param, nu_sq = params
-        # vars = list(vars)
-        # print('vars is {}'.format(vars))
-        print('number of iteratons {}'.format(iterations))
-        vars = [var_type for _ in range(k)]
-        model = train_supervised_lda_model(alpha, eta, k, min_cf, min_df, vars, glm_param, nu_sq, corpus, iterations)
-        print('Finished training...')
-
-    perplexity = calculate_perplexity(model)
-    coherence = calculate_coherence(model)
-
-    # Since we want to minimize the objective function, we negate the coherence score
-    # and add it to perplexity to get a single metric to optimize
-    if model_type == 'LDA':
-        curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations}
-        print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
-    elif model_type =='SLDA':
-        curr_parameters = {'alpha': alpha, 'eta': eta, 'k': k, 'min_cf': min_cf, 'min_df': min_df, 'iterations': iterations, 'var': var_type, 'glm': glm_param, 'nu_sq': nu_sq}
-        print(f'Current hyperparameters: {curr_parameters}, perplexity: {perplexity}, coherence: {coherence}')
-    # Normalize perplexity and coherence to [0, 1]
-    normalized_perplexity = normalize(perplexity, min_perplexity, max_perplexity)
-    normalized_coherence = normalize(coherence, min_coherence, max_coherence)
-
-    # Combine normalized perplexity and coherence using weights
-    combined_score = perplexity_weight * normalized_perplexity - coherence_weight * normalized_coherence
-    return combined_score
-
-
-
-if __name__ == '__main__':
-    # ...
-    
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument("--model", help="number of topics",
-                       type=str, default='LDA', required=False)
-    args = argparser.parse_args()
-    MODEL = args.model
-
-    # k = 20
-    file_path = './Data/congressional_bill_processed.pkl'
-    corpus = build_corpus(file_path, MODEL)
-
-    def create_callback():
-        call_counter = 0
-
-        def print_iteration_number(res):
-            nonlocal call_counter
-            call_counter += 1
-            print(f'Iteration: {call_counter}')
-            print('-------------------')
-
-        return print_iteration_number
-    
-    min_perplexity = 10
-    max_perplexity = 3000
-    min_coherence = -1
-    max_coherence = 1
-    perplexity_weight = 0.2
-    coherence_weight = 0.8
-
-
-    if MODEL == 'LDA':
-        space = [
-            Real(0.1, 1.0, name='alpha'),
-            Real(0.1, 1.0, name='eta'),
-            # Integer(20, 20, name='k'),
-            # Integer(1, 5, name='min_cf'),
-            # Integer(1, 5, name='min_df'),
-            Integer(50, 250, name='iterations'),
-            Integer(2, 20, name='k')
-        ]
-
-        res_gp = gp_minimize(
-            func=lambda params: objective(params, corpus, min_perplexity, max_perplexity, min_coherence, max_coherence, perplexity_weight, coherence_weight, MODEL),
-            dimensions=space,
-            n_calls=50,  # Number of iterations, increase for better results at the cost of longer runtime
-            random_state=0,
-            verbose=True,
-            callback=[create_callback()]
-        )
-
-        best_hyperparameters = {
-            'alpha': res_gp.x[0],
-            'eta': res_gp.x[1],
-            'k': res_gp.x[2],
-            # 'min_cf': res_gp.x[2],
-            # 'min_df': res_gp.x[3],
-            'iterations': res_gp.x[4]
-        }
-
-        print(f'Best hyperparameters: {best_hyperparameters}')
-    elif MODEL == 'SLDA':
-        print('SLDA')
-     
-        space = [
-        Real(0.1, 1.0, name='alpha'),
-        Real(0.1, 1.0, name='eta'),
-        # Integer(2, 20, name='k'),
-        Integer(1, 5, name='min_cf'),
-        Integer(1, 5, name='min_df'),
-        Integer(50, 250, name='iterations'),
-        # Categorical([tuple(np.random.uniform(0.01, 10.0, 20)) for _ in range(10)], name='vars'),  # Change 20 to the maximum number of topics you expect
-        # [Categorical(['l', 'b'], name=f'vars_{i}') for i in range(k)],
-        Categorical(['l', 'b'], name='vars'),
-        Real(0.1, 10.0, name='glm_param'),
-        Real(0.01, 10.0, name='nu_sq')
-        ]
-
-        def create_callback():
-            call_counter = 0
-
-            def print_iteration_number(res):
-                nonlocal call_counter
-                call_counter += 1
-                print(f'Iteration: {call_counter}')
-                print('-------------------')
-
-            return print_iteration_number
-
-        min_perplexity = 10
-        max_perplexity = 2000
-        min_coherence = -1
-        max_coherence = 1
-        perplexity_weight = 0.2
-        coherence_weight = 0.8
-
-        res_gp = gp_minimize(
-            func=lambda params: objective(params, corpus, min_perplexity, max_perplexity, min_coherence, max_coherence, perplexity_weight, coherence_weight, MODEL),
-            dimensions=space,
-            n_calls=100,  # Number of iterations, increase for better results at the cost of longer runtime
-            random_state=0,
-            verbose=True,
-            callback=[create_callback()]
-        )
-
-        best_hyperparameters = {
-            'alpha': res_gp.x[0],
-            'eta': res_gp.x[1],
-            # 'k': res_gp.x[2],
-            'min_cf': res_gp.x[2],
-            'min_df': res_gp.x[3],
-            'iterations': res_gp.x[4],
-            'var': res_gp.x[5],
-            'glm_param': res_gp.x[6],
-            'nu_sq': res_gp.x[7]
-        }
-
-        print(f'Best hyperparameters: {best_hyperparameters}')
-# LDA: Best hyperparameters: {'alpha': 0.1, 'eta': 1.0, 'min_cf': 4, 'min_df': 5, 'iterations': 173}
+coherences = determine_best_lda_params('ETM')
+print(coherences)

@@ -41,6 +41,13 @@ class Preprocessing():
         # Use TF-IDF to remove boring words
         tf_idf_words = self.get_filtered_words(data, 3)
 
+        stop_words.union(tf_idf_words)
+
+        print('stopwords')
+        print(stop_words)
+        print('----')
+        print(len(stop_words))
+
         #Creating and updating our list of tokens using list comprehension 
         if 'newsgroup' in data_path:
             for doc in docs:

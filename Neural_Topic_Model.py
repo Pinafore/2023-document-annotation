@@ -1,6 +1,8 @@
 import random
 import pickle
 import numpy as np
+from gensim.models import CoherenceModel
+from gensim.corpora import Dictionary
 
 class Neural_Model():
     def __init__(self, model_path, data_path, dataset_dir):
@@ -41,6 +43,24 @@ class Neural_Model():
         self.topic_keywords = output_topics
         return output_topics
     
+    def get_coherence(self):
+        dictionary = Dictionary(self.data_words_nonstop)
+        model_keywords = self.print_topics()
+
+        keywords = []
+        for k, v in model_keywords.items():
+            keywords.append(v)
+
+        coherence_model = CoherenceModel(
+        topics=keywords,
+        texts=self.data_words_nonstop,
+        dictionary=dictionary,
+        coherence='c_v'
+        )
+
+        coherence_score = coherence_model.get_coherence()
+        return coherence_score
+
     def predict_doc_with_probs(self, doc_id, topics):
         # print(topics)
         
@@ -124,4 +144,16 @@ class Neural_Model():
                 res_ele = ' '.join(doc)
                 result.append(res_ele)
 
+        return result
+    
+    def concatenate_keywords_raw(self, topic_keywords, raw_texts):
+        result = []
+
+        for i, doc in enumerate(raw_texts):
+            topic_idx = np.argmax(self.doc_topic_probas[i])
+            keywords = topic_keywords[topic_idx]
+            keywords_str = ' '.join(keywords)
+            res_ele = doc + ' ' + keywords_str
+            result.append(res_ele)
+        
         return result

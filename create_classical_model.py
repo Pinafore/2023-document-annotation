@@ -25,7 +25,7 @@ def main():
     argparser.add_argument("--load_data_path", help="Whether we LOAD the data",
                        type=str, default='./Data/congressional_bill_processed.pkl', required=False)
     argparser.add_argument("--train_len", help="number of training samples",
-                       type=int, default=258, required=False)
+                       type=int, default=500, required=False)
 
     args = argparser.parse_args()
     

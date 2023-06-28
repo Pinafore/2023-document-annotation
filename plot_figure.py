@@ -38,28 +38,48 @@ def read_all_recommendations(db_name, topic_info):
     if topic_info:
         with sqlite3.connect(db_name) as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT user_id, topic_information FROM recommendations')
+            cursor.execute('SELECT user_id, topic_information FROM recommendations ')
             rows = cursor.fetchall()
 
-        for row in rows:
-            print('user_id: ', row[0])
-            print('topic_information: ', row[1])
-            
-            print('-----')
+            for row in rows:
+                user_id = row[0]
+                topic_information = row[1]
+
+                print('user_id:', user_id)
+                print('topic_information:', topic_information)
+                print('---')
     else:
         with sqlite3.connect(db_name) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT user_id, label, doc_id, response_time FROM recommendations')
             rows = cursor.fetchall()
 
-        for row in rows:
-            print('user_id: ', row[0])
-            print('label: ', row[1])
-            print('doc_id: ', row[2])
-            print('response_time: ', row[3])
-            
-            print('-----')
+            for row in rows:
+                user_id = row[0]
+                label = row[1]
+                doc_id = row[2]
+                response_time = row[3]
 
+                print('user_id:', user_id)
+                print('label:', label)
+                print('doc_id:', doc_id)
+                print('response_time:', response_time)
+                print('---')
+
+
+def read_all_users(db_name):
+    with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT user_id, mode FROM users ')
+            rows = cursor.fetchall()
+
+            for row in rows:
+                user_id = row[0]
+                mode = row[1]
+
+                print('user_id:', user_id)
+                print('mode:', mode)
+                print('---')
 
 '''
 print all the user ids and the mode used for the user
@@ -91,9 +111,13 @@ def read_accuracy_db(user_id, database, accuracy_type):
     conn.close()
 
     accuracies = []
-    for row in rows:
+    for i, row in enumerate(rows):
         # print(row[0])
         accuracies.append(row[0])
+        print('num doc: {}, acc: {}'.format(i, row[0]))
+    
+    print('-'* 10)
+
 
     return accuracies
 
@@ -109,6 +133,11 @@ def plot_comparison(id1, id2, db_name, acc_type, id1_name, id2_name, save_path):
     print(session2_acc[0:20])
     start_index = 0
 
+    if id1 % 4 == 0:
+        session1_acc.pop()
+    if id2 % 4 == 0:
+        session2_acc.pop()
+
     for i in range(len(session1_acc)):
         if session1_acc[i] < 0 and i > start_index:
             start_index = i
@@ -120,6 +149,7 @@ def plot_comparison(id1, id2, db_name, acc_type, id1_name, id2_name, save_path):
     print(start_index)
     start_index += 1
     min_len = len(session1_acc) -start_index
+
     data_to_plot = {    
                 'number documents labeled': [i+1+start_index for i in range(min_len)] * 2,
                 'training acc': session1_acc[start_index:]+ session2_acc[start_index:],
@@ -133,14 +163,31 @@ def plot_comparison(id1, id2, db_name, acc_type, id1_name, id2_name, save_path):
 
 database_name = 'local_users.db'
 database_name = 'server_users.db'
-database_name = './database/06_23_2023_test.db'
-acc_type = 'global_training_acc'
+database_name = './database/06_26_2023_newsgroup_test.db'
+database_name = './database/06_27_2023_newsgroup_test.db'
+acc_type = 'local_training_acc'
 
 
 # print_users_and_modes(database_name)
-read_all_recommendations(database_name, True)
-exit(0)
-plot_comparison(55, 62, database_name, acc_type, 'hand SLDA','opt SLDA', './plot_results/hand_SLDA_vs_opt_min_cf_SLDA.png')
+# read_all_recommendations(database_name, False)
+# read_all_users(database_name)
+# read_accuracy_db(5, database_name, acc_type)
+# exit(0)
+plot_comparison(1, 2, database_name, acc_type, 'LDA','SLDA', './plot_results/06_28_2023_20newsgroup/LDA_vs_SLDA.png')
+
+'''
+1: LDA concatenate features
+2: SLDA concatenate features 
+3: ETM concatenate features
+4: Active Learning
+5: LDA concatenate features
+6: SLDA concatenate features fine tuining
+7: ETM no concatenate features
+8: Active Learning
+9: LDA no concatenate features
+10: SLDA no concatenate features
+'''
+
 
 
 
