@@ -12,6 +12,11 @@ a:visited {
   color: inherit;
 }
 
+mark {
+  padding: 0 !important; 
+  background-color: #ffee94 !important;
+}
+
 .instructions{
 
   width: 60%;
@@ -94,7 +99,7 @@ main,
   background-color: white;
   padding: 1rem;
   font-size: large;
-  height: 30rem;
+  height: 25vw;
   overflow-y: auto;
   overflow-x: hidden;
   border-right: 1px solid rgb(72, 139, 181);
@@ -344,3 +349,7 @@ thead {
 
 
 
+.highlighted-word {
+  background-color: yellow;
+  text-transform: none;
+}

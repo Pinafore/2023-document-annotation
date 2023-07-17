@@ -1,123 +1,133 @@
 let wordsToHighlight = []
 const acc = document.querySelectorAll(".right_topics");
-console.log(acc)
+// console.log(acc)
 
 
-textElement=document.getElementById("text");
+textElement = document.getElementById("text");
+oritextElement = document.getElementById("original_text");
 // console.log(textElement.innerText)
-const original_text = textElement.innerText;
+const original_text = oritextElement.innerText;
 const viewButtons = document.querySelectorAll(".view");
 
-
+// const REGEXP_SPECIAL_CHAR = /[\!\#\$\%\^\&\*\)\(\+\=\.\<\>\{\}\[\]\:\;\'\"\|\~\`\_\-]/g;
+// const REGEXP_SPECIAL_CHAR = /[\&\*\)\(\+\=\.\<\>]/g;
+const REGEXP_SPECIAL_CHAR = /[\<\>]/g;
+num = 0
 
 viewButtons.forEach((btn, index) => {
-    btn.addEventListener("click", function (event) {
-        // removeAllActive()
-        let topic_el = btn.parentElement.nextElementSibling.getElementsByTagName("span");
-        
-        const wordsArr = [];
-        Array.from(topic_el).forEach(function (ele) {
-            wordsArr.push(ele.innerText);
-        });
-        console.log(wordsArr)
-        highlighWords(wordsArr);
+  btn.setAttribute('highlighted', 'false')
+  btn.addEventListener("click", function (event) {
+    // removeAllActive()
+    let topic_el = btn.parentElement.nextElementSibling.getElementsByTagName("span");
 
+    const wordsArr = [];
+    Array.from(topic_el).forEach(function (ele) {
+      wordsArr.push(ele.innerText);
     });
+
+    if (btn.getAttribute('highlighted') === 'true') {
+      textElement.innerHTML = original_text;
+      btn.setAttribute('highlighted', 'false');
+    } else {
+      highlighWords(wordsArr);
+      btn.setAttribute('highlighted', 'true');
+    }
+
+    // console.log(wordsArr)
+    // if (num % 2 === 0){
+    //   highlighWords(wordsArr);
+    // }
+    // else {
+    //   textElement.innerHTML = original_text;
+    // }
+    // num = num + 1
+  });
 });
 
 
+let specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 
 function highlighWords(words) {
-    var text = original_text;
-    console.log(words)
-    words.forEach((word) => {
-      if (word.length>2){
-        const pattern = new RegExp(word, "gi");
-        text = text.replace(
-          pattern,
-          "<span style='background-color:yellow'>" + word + "</span>"
-        );
-        textElement.innerHTML = text;
-        // console.log(textElement)
-      }
-    });
-  }
-
-  const select = document.querySelector(".suggestion");
-  const label = document.querySelector(".text_input");
-  const submitButton = document.querySelector("#myBtn");
-  console.log({ select, submitButton });
-  
-  submitButton.disabled = true;
-  
-  let selectValue;
-  let labelValue;
-  
-  select.addEventListener("change", (e) => {
-    selectValue = e.target.value;
-    checkButtonEnabled();
-  });
-  
-  label.addEventListener("change", (e) => {
-    labelValue = e.target.value;
-    checkButtonEnabled();
-  });
-  
-  function checkButtonEnabled() {
-    if (selectValue && labelValue) {
-      submitButton.disabled = true;
-    } else if (selectValue || labelValue) {
-      submitButton.disabled = false;
+  console.log(words)
+  var text = original_text;
+  words.forEach((word) => {
+    if (!specialChars.test(word) && word.length > 2) {
+      const pattern = new RegExp(word, "g");
+      text = text.replace(
+        pattern,
+        `<mark>${word}</mark>`
+      );
+      textElement.innerHTML = text;
+      // console.log(textElement)
     }
+  });
+}
+
+
+
+
+
+
+
+const select = document.querySelector(".suggestion");
+const label = document.querySelector(".text_input");
+const submitButton = document.getElementById("myBtn")
+
+submitButton.disabled = true;
+
+let selectValue = 0;
+let labelValue = 0;
+
+select.addEventListener("change", (e) => {
+  selectValue = e.target.value.length;
+  // console.log(selectValue.length)
+  // console.log(selectValue)
+  checkButtonEnabled();
+  // console.log(selectValue)
+});
+
+label.addEventListener("input", (e) => {
+  labelContent = e.target.value.trim();
+  labelValue = labelContent.length;
+  // labelValue = e.target.value.length;
+  // console.log(labelValue)
+  // console.log(labelValue.length)
+  checkButtonEnabled();
+});
+
+function checkButtonEnabled() {
+  if ((selectValue != 0) && (labelValue === 0) || ((selectValue === 0) && (labelValue != 0))) {
+    submitButton.disabled = false;
   }
+  else {
+    submitButton.disabled = true;
+  }
+}
 
-  // function openForm() {
-  //   document.getElementById("loginPopup").style.display = "block";
-  // }
-  // function closeForm() {
-  //   document.getElementById("loginPopup").style.display = "none";
-  // }
-  // // When the user clicks anywhere outside of the modal, close it
-  // window.onclick = function (event) {
-  //   let modal = document.getElementById('loginPopup');
-  //   if (event.target == modal) {
-  //     closeForm();
-  //   }
-  // }
+var minutesLabel = document.getElementById("minutes");
+var secondsLabel = document.getElementById("seconds");
+var totalSeconds = 0;
 
+console.log(minutesLabel)
+console.log(secondsLabel)
 
-// written = document.getElementById("written")
-// sugg= document.getElementById("suggestion")
+setInterval(setTime, 1000);
 
-// // label = document.forms["responses"]["label"].value
+function setTime() {
+  ++totalSeconds;
+  secondsLabel.innerHTML = pad(totalSeconds % 60);
+  minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+}
 
-// var write  = written.value
-// var suggest = sugg.value
-
-
-// written.onkeyup = function() {
-//   console.log(this.value);
-// };
-
-
-
-// sugg.addEventListener("click", function(event){
-//   console.log(sugg.value)
-
-// })
-
-
-// // console.log(written)
-// // console.log(sugg)
-
-// traps = document.getElementById("myBtn")
-// traps.disabled = false;
-// traps.classList.add("fadeIn");
-  
-
-
-
-
+function pad(val) {
+  var valString = val + "";
+  if (valString.length < 2) {
+    return "0" + valString;
+  }
+  else {
+    return valString;
+  }
+}
 
 
 

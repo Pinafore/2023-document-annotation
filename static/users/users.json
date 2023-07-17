@@ -1,266 +1,104 @@
 {
-    "x1": {
-        "username": "x1",
+    "Sarah-LDA-001": {
+        "username": "Sarah-LDA-001",
         "id": 1,
-        "labels": ",training,bill program",
-        "labelled_document": ",230,72"
+        "labels": ",transportation planning,transportation,planning,operating costs,land,cost,funds,funds,transportation,bill,funds,bill,covid,transportation planning,operating costs,transportation fee,transportation construction,transportation grants,transportation funds,passenger safety,transportation project,transportation project,project funds,transportation infrastructure,transportation,train,baseball,surface transportation,safety,storage,highway,bicycles,transportation,railroad,bicycles,highway standards,bicycle,bicycles,operating costs,transportation",
+        "labelled_document": ",3681,3998,2130,3454,226,3454,3473,1997,1996,4656,5782,1414,4204,2431,3178,5848,2035,2336,2186,3867,5790,1302,5802,1758,5469,2830,2479,300,1355,5809,107,3708,481,3952,1947,1325,3708,1687,5537,3160"
     },
-    "x2": {
-        "username": "x2",
+    "Ben-SLDA-002": {
+        "username": "Ben-SLDA-002",
         "id": 2,
-        "labels": ",rockies,tribal,tax exempt",
-        "labelled_document": ",188,144,125"
+        "labels": ",bill,program,u.s. fish and wildlife service,water,basin,wildlife,water,island,project,facility,energy,docket,the nist voting program performs technical research to support the development of standards and guidelines for current and future voting systems.,state,vulnerable,railway",
+        "labelled_document": ",5797,4265,1492,5797,4355,3833,4557,3466,2130,5153,5197,3473,4492,4656,1414,1997"
     },
-    "x3": {
-        "username": "x3",
+    "Juan-ETM-003": {
+        "username": "Juan-ETM-003",
         "id": 3,
-        "labels": ",mobile,organization,law",
-        "labelled_document": ",53,126,93"
+        "labels": ",civil rights,national security,domestic manufacturing,mandatory requirements,natural resources,criminal law,mandatory requirements,mandatory requirements,mandatory requirements,criminal law,benefits,mandatory requirements,natural resources,national security,economic development,economic development,equity,mandatory requirements,mandatory requirements,economic development,natural resources,civil rights,mandatory requirements,mandatory requirements,mandatory requirements,employment,equity,national security,mandatory requirements,infrastructure,economic development,mandatory requirements,mandatory requirements,economic development,natural resources,natural resources,employment,employment,statutory program,employment,grants,grants,student loans,economic development,mandatory requirements,natural resources,mandatory requirements,grants,economic development,designation,grants,student loans,mandatory requirements,grants,criminal law,natural resources,employment,standards,natural resources,benefits,natural resources,natural resources,employment,mandatory requirements,employment,mandatory requirements,national security",
+        "labelled_document": ",588,5105,2447,976,5306,5756,3276,4941,445,1828,3564,2151,5326,1001,3673,2151,4580,4790,6189,3575,5229,2129,5848,4093,3704,3941,5901,5772,6285,3713,2206,5053,1184,811,5574,6174,2589,4007,5278,5256,757,4357,2726,4014,521,680,457,1975,3614,4203,1238,4162,1436,2072,61,4650,4562,5355,1630,4829,3757,6155,9,5794,5924,4953,5201"
     },
-    "x4": {
-        "username": "x4",
+    "Daniel-004": {
+        "username": "Daniel-004",
         "id": 4,
-        "labels": ",electronics,drug prescription,immigrants,congress,climate energy,electronics,electronics,congress,health care,immigrants,health care,congress,health care",
-        "labelled_document": ",129,128,183,182,118,127,74,192,99,181,174,239,78"
+        "labels": "",
+        "labelled_document": ""
     },
-    "x5": {
-        "username": "x5",
+    "Emily-LDA-005": {
+        "username": "Emily-LDA-005",
         "id": 5,
-        "labels": ",state department training,foreign service,veteran health,veteran health,veteran health,veteran health,veteran health,veteran health,exposure radiation,exposure radiation,veteran immigration,firefighter protection,veteran immigration",
-        "labelled_document": ",230,72,201,74,67,100,69,126,108,159,238,223,25"
+        "labels": "",
+        "labelled_document": ""
     },
-    "x6": {
-        "username": "x6",
+    "Alden-SLDA-006": {
+        "username": "Alden-SLDA-006",
         "id": 6,
-        "labels": ",land ecosystem,tribal land,general infrastructure,general infrastructure,general infrastructure,general infrastructure,water infrastructure,voting system,voting system,voting system,usda online transaction,criminal laws,general infrastructure,electromagnetic spectrum usage,energy efficient techonology,general infrastructure,general infrastructure,automated vehicles,online speech rights,online speech rights,online privacy,online privacy,covid 19 vaccination,tax exemption,tax exemption,tax exemption,paycheck service,pension,president election and voting,congress power,congress budget,president election and voting,fight with communist,fight with communist,fight with communist,fight with communist,fight with communist,firefighter and lands,immigration and homeland security,gardian policy,lake, ocean exploration",
-        "labelled_document": ",188,144,125,22,203,192,211,70,29,117,20,21,81,45,76,256,199,170,136,123,127,55,148,229,254,241,139,18,165,176,1,166,164,164,164,164,164,250,246,163,221"
+        "labels": ",greenhouse gas,water,water,water,water,water,water,fishing,water,water,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,greenhouse gas,greenhouse gas,greenhouse gas,greenhouse gas,greenhouse gas,transportation,pollution,transportation,transportation,telecom,transportation,transportation,transportation,transportation,water,transportation,transportation",
+        "labelled_document": ",5058,4265,1492,5797,4355,3833,4557,3466,467,4743,2130,1947,5153,4260,5469,300,5790,4492,1997,1996,1170,997,5795,107,1758,4681,1302,2321,3454,568,400,400,78,1414,2035,3160,2431,2830,3715,4656,1355,3425,3782,2336,921,1623,1623,3487,3124,601,2186,125,3132,2336,4590,5067,2499,891,921"
     },
-    "x7": {
-        "username": "x7",
+    "zongxia-ETM": {
+        "username": "zongxia-ETM",
         "id": 7,
-        "labels": ",covid remote policy,veteran health care",
-        "labelled_document": ",53,126"
+        "labels": "",
+        "labelled_document": ""
     },
-    "x8": {
-        "username": "x8",
+    "zongxia-active": {
+        "username": "zongxia-active",
         "id": 8,
-        "labels": ",electronics",
-        "labelled_document": ",129"
+        "labels": ",resources,forest",
+        "labelled_document": ",60,4499"
     },
-    "x9": {
-        "username": "x9",
+    "zongxia-LDA": {
+        "username": "zongxia-LDA",
         "id": 9,
-        "labels": ",tax funding act,environment energy,tax funding act,tax funding act,tax funding act,tax funding act,loan,tax funding act,education student loan",
-        "labelled_document": ",200,162,229,254,241,158,139,119,249"
-    },
-    "x10": {
-        "username": "x10",
-        "id": 10,
         "labels": "",
         "labelled_document": ""
     },
-    "x11": {
-        "username": "x11",
+    "zongxia-SLDA": {
+        "username": "zongxia-SLDA",
         "id": 10,
-        "labels": ",criminal penalty,religious exemption,health service care,health service care,health service care,mental health service,health service care,mental health service,cryptography food service,congress transparency,species conservation,cybersecurity,national research,international relation defense,ocean cleaning,national institute health foundation,highway safety,us postal service,equal rights amendment,hawaii homestead protection,statue approvement,federal building,unemployment compensation,retirement benefits,disability employment benefits,lumpsum payments,unemployment compensation,retirement benefits,watershed restoration,community transportation planning,agriculture growth,workers benefit rights",
-        "labelled_document": ",272,161,388,78,261,394,44,123,11,13,81,56,425,229,175,423,458,77,3,6,9,206,320,318,464,170,94,89,348,361,95,305"
+        "labels": ",water,water,water,water,flood,water,water,conservation management,water,invasive species,water,water,water,restoration,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,transportation,railroad transportation,transportation,railroad transportation,railroad transportation,metropolitan transportation,transportation,railroad transportation,railroad transportation,land wilderness,land wilderness,land wilderness,land wilderness,land wilderness,khui,event",
+        "labelled_document": ",1817,4265,1492,5797,4355,3833,4557,3466,467,4743,2504,1239,3291,5969,3708,1947,2130,300,4260,3473,5153,5469,1302,5790,3681,3998,3715,3448,2830,1996,107,1997,78,1758,2336,3867,3121,226,679,2788,4698,1792,1170"
     },
-    "x12": {
-        "username": "x12",
+    "local-user4": {
+        "username": "local-user4",
         "id": 11,
-        "labels": ",tax relief,pilot retirement,motor safety,tax relief,health care,watchdog bill",
-        "labelled_document": ",496,384,299,238,0,416"
-    },
-    "x13": {
-        "username": "x13",
-        "id": 12,
         "labels": "",
         "labelled_document": ""
     },
-    "x14": {
-        "username": "x14",
+    "local-user5": {
+        "username": "local-user5",
         "id": 12,
-        "labels": "",
-        "labelled_document": ""
+        "labels": ",repoty",
+        "labelled_document": ",1"
     },
-    "x15": {
-        "username": "x15",
-        "id": 12,
-        "labels": ",empower",
-        "labelled_document": ",250"
-    },
-    "x16": {
-        "username": "x16",
+    "local-user6": {
+        "username": "local-user6",
         "id": 13,
         "labels": "",
         "labelled_document": ""
     },
-    "x17": {
-        "username": "x17",
-        "id": 13,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x18": {
-        "username": "x18",
+    "local-user7": {
+        "username": "local-user7",
         "id": 14,
         "labels": "",
         "labelled_document": ""
     },
-    "x19": {
-        "username": "x19",
+    "local-user8": {
+        "username": "local-user8",
         "id": 15,
+        "labels": ",employee,homeland security,transportation",
+        "labelled_document": ",588,5105,2447"
+    },
+    "local-user9": {
+        "username": "local-user9",
+        "id": 16,
         "labels": "",
         "labelled_document": ""
     },
-    "x20": {
-        "username": "x20",
+    "server-user1": {
+        "username": "server-user1",
         "id": 17,
-        "labels": ",population,school bus,finance,employment compensation",
-        "labelled_document": ",425,360,241,492"
-    },
-    "x21": {
-        "username": "x21",
-        "id": 18,
-        "labels": ",kid medical care,health care,jury,pandemic compensation,pandemic compensation,pandemic compensation,civil rights,unemployment compensation,transportation energy,transportation energy",
-        "labelled_document": ",261,388,358,239,492,94,314,320,319,414"
-    },
-    "x22": {
-        "username": "x22",
-        "id": 19,
         "labels": "",
         "labelled_document": ""
-    },
-    "x23": {
-        "username": "x23",
-        "id": 21,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x24": {
-        "username": "x24",
-        "id": 22,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x25": {
-        "username": "x25",
-        "id": 23,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x26": {
-        "username": "x26",
-        "id": 24,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x27": {
-        "username": "x27",
-        "id": 25,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x28": {
-        "username": "x28",
-        "id": 26,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x29": {
-        "username": "x29",
-        "id": 27,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x30": {
-        "username": "x30",
-        "id": 28,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x31": {
-        "username": "x31",
-        "id": 29,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x32": {
-        "username": "x32",
-        "id": 30,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x33": {
-        "username": "x33",
-        "id": 31,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x34": {
-        "username": "x34",
-        "id": 32,
-        "labels": "",
-        "labelled_document": ""
-    },
-    "x35": {
-        "username": "x35",
-        "id": 33,
-        "labels": ",sex, race, gender,school education",
-        "labelled_document": ",425,360"
-    },
-    "x36": {
-        "username": "x36",
-        "id": 34,
-        "labels": ",kid medical,health services",
-        "labelled_document": ",261,388"
-    },
-    "x37": {
-        "username": "x37",
-        "id": 35,
-        "labels": ",indian tribes",
-        "labelled_document": ",220"
-    },
-    "x38": {
-        "username": "x38",
-        "id": 37,
-        "labels": ",sex, race, age",
-        "labelled_document": ",425"
-    },
-    "x39": {
-        "username": "x39",
-        "id": 38,
-        "labels": ",dental medicare coverage",
-        "labelled_document": ",261"
-    },
-    "x40": {
-        "username": "x40",
-        "id": 39,
-        "labels": ",transparency",
-        "labelled_document": ",335"
-    },
-    "x41": {
-        "username": "x41",
-        "id": 41,
-        "labels": ",sex, race, gender,school safety,employee wage,employee wage,school safety,gender,new_label,school safety,gender",
-        "labelled_document": ",425,360,241,492,409,172,318,249,320"
-    },
-    "x42": {
-        "username": "x42",
-        "id": 42,
-        "labels": ",kids,bill,bill,kids",
-        "labelled_document": ",261,388,358,239"
-    },
-    "x43": {
-        "username": "x43",
-        "id": 43,
-        "labels": ",empower",
-        "labelled_document": ",250"
-    },
-    "x44": {
-        "username": "x44",
-        "id": 45,
-        "labels": ",a,b,c,d",
-        "labelled_document": ",425,360,241,492"
     }
 }
