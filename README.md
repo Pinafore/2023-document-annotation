@@ -1,1 +1,2 @@
-# EMNLP-2023-NTM
+# Document Annotation App
+To run the app, use flask run -p {your port number}
