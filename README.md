@@ -5,6 +5,7 @@ This is a single flask app interface for speeding up document annotation and tes
 ## Run Interface Locally With Default Congressional Bill Dataset
 
 ```
+cd flask_app
 flask run -p <your port number>
 ```
 
@@ -34,13 +35,14 @@ Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookf
 
       The table must be contain the following columns
 
-      | text | label | general_labels | sub_labels |
-    | --------------- | --------------- | --------------- | --------------- |
-    | Text Passages    | Major Topic    | Major Topic | Minor Topic |
+      | text | label |  sub_labels |
+    | --------------- | --------------- | --------------- |
+    | Text Passages    |  Major Topic | Minor Topic |
    
     
     To process the data, run the following
   ```
+  cd Topic_Models
   python data_process.py --doc_dir <json_file_path> --save_path <pickle_file_name_to_be_saved>
   ```
 
