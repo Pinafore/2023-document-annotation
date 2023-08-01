@@ -68,3 +68,6 @@ python train_save_topic_model.py --num_topics <number_of_topics> \
 
 3. To reproduce the synthetic experiment, first train your model with step 1 or 2.
    Then open synthetic_experiment.ipynb to run the models
+
+4. To plot the results for the synthetic experiment, go to new_model_plot.ipynb'. Then
+   read the saved results and plot
