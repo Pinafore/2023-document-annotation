@@ -40,45 +40,31 @@ Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookf
     | Text Passages    |  Major Topic | Minor Topic |
    
     
-    To process the data, run the following
+    To process the data, run the following. To process your own dataset, run `python data_process.py --help` to see the arguments
   ```
   cd Topic_Models
-  python data_process.py --doc_dir <json_file_path> --save_path <pickle_file_name_to_be_saved>
+  python data_process.py 
   ```
 
 
-2. Classical Topic Model Training
+2. Topic Model Training
 
 
-   To train a classical topic model, run
+   To train a topic model, run
 ```
-python create_classical_model.py --num_topics <number_of_topics> \ 
+cd Topic_Models
 
+python train_save_topic_model.py --num_topics <number_of_topics> \ 
 --num_iters <number_of_training_iterations> \
-
---model_type <LDA_or_SLDA> \
-
---load_data_path <your_processed_data_path>
-
---train_len <number_of_texts_to_train>
+--model_type <LDA_or_SLDA_or_ETM> \
+--load_data_path <Processed_pickle_data_path>
+--num_topics <number_of_topics>
 ```
 
-3. Neural Topic Model Training (we use embedded neural topic model here)
+   The trained topic models will be saved to './Topic_Models/Model/' directory. 
+   The saved models will be in a pickle format '{model_type}_{number of topics}.pkl'
 
-    To train a neural topic model, run
-    
-```
-python neural_model.py --num_topics <number_of_topics> \ 
-
---num_iters <number_of_training_iterations> \
-
---model_type ETM \
-
---load_data_path <your_processed_data_path>
-
---train_len <number_of_texts_to_train>
-```
     
 
-Model not updated yet. 
-More Details will be added later
+3. To reproduce the synthetic experiment, first train your model with step 1 or 2.
+   Then open synthetic_experiment.ipynb to run the models
