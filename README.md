@@ -42,5 +42,14 @@ python train_save_topic_model.py --num_topics <number_of_topics> \
 --num_topics <number_of_topics>
 ```
 
-   The trained topic models will be saved to './Topic_Models/Model/' directory. 
-   The saved models will be in a pickle format '{model_type}_{number of topics}.pkl'
+### Step 3: Synthetic Experiment
+
+To reproduce the synthetic experiment, first train your model using Step 1 or Step 2. Then, open `synthetic_experiment.ipynb` to run the models.
+
+### Step 4: Plotting Results
+
+To visualize the synthetic experiment results, navigate to `new_model_plot.ipynb`. This notebook allows you to read and plot the saved results.
+
+## Trained Topic Models
+
+All trained topic models are saved in the `./Topic_Models/Model/` directory. Model files are stored in pickle format and follow the naming convention: `{model_type}_{number_of_topics}.pkl`. For instance, you might find files like `LDA_20.pkl`.
