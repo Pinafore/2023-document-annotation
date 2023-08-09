@@ -49,6 +49,8 @@ Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookf
 
 2. Topic Model Training
 
+   The following are the list of topic models you can train
+   LDA, supervised LDA, embedded topic model, contextualized topic model, bertopic, partially labaled LDA, labeled LDA
 
    To train a topic model, run
 ```
@@ -56,9 +58,10 @@ cd Topic_Models
 
 python train_save_topic_model.py --num_topics <number_of_topics> \ 
 --num_iters <number_of_training_iterations> \
---model_type <LDA_or_SLDA_or_ETM> \
+--model_type <LDA_or_SLDA_or_ETM_or_CTM_or_Bertopic_or_PLDA_or_LLDA> \
 --load_data_path <Processed_pickle_data_path>
 --num_topics <number_of_topics>
+--raw_text_path <json_file_path_filtered_by_data_process.py>
 ```
 
    The trained topic models will be saved to './Topic_Models/Model/' directory. 
