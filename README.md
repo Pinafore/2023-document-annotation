@@ -27,6 +27,8 @@ http://www.congressionalbills.org
 Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf
 ```
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1I_paD2g21C24Mdzu0DdqCThMu6znCl2Y/view?usp=sharing/]
+
 ## Pipeline
 
 1. Data Preprocessing (Tokenizing words, and save tokenized passages as a pickle file. A new copy of the json file with any passsages that have length 0 after tokenization will be removed and saved)
@@ -55,6 +57,7 @@ Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookf
    To train a topic model, run
 ```
 cd Topic_Models
+
 python train_save_topic_model.py --num_topics <number_of_topics> \ 
 --num_iters <number_of_training_iterations> \
 --model_type <LDA_or_SLDA_or_ETM_or_CTM_or_Bertopic_or_PLDA_or_LLDA> \
