@@ -3,7 +3,7 @@ Speeding up document annotation
 
 # NLP Topic Models
 
-## Run Interface Locally With Default Congressional Bill Dataset and trained LDA model
+## Run Backend Tool Locally With Default Congressional Bill Dataset and trained LDA model to connect to the user UI
 
 ```
 flask run -p <your port number>
