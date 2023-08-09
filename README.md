@@ -23,7 +23,7 @@ python data_process.py --help
 
 ## Dataset Information
 
-This app supports two datasets:
+The experiments are run on the following two datasets:
 
 1. **20newsgroup**: A dataset of newsgroup documents.
 2. **congressional_bill_project_dataset**: A dataset of Congressional Bill documents.
@@ -32,11 +32,11 @@ For the Congressional Bill dataset, the app uses data from the following sources
 - [Comparative Agendas Project](https://www.comparativeagendas.net/us)
 - [Congressional Bills](http://www.congressionalbills.org)
 
-To align topics with labels, refer to the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
+To align topic numbers with labels for Congressional Bill dataset, refer to the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
 
 ## Run in Colab
 
-You can also access the app using Google Colab. Click the badge below to open the app notebook:
+You can also access the theoretical experiments using Google Colab. Click the badge below to open the app notebook (download the code from github and upload it to google drive first):
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Pinafore/2023-document-annotation/blob/working-app/synthetic_experiment.ipynb)
 
