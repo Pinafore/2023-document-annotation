@@ -92,3 +92,15 @@ To visualize the synthetic experiment results, navigate to `new_model_plot.ipynb
 
 All trained topic models are saved in the `./Topic_Models/Model/` directory. Model files are stored in pickle format and follow the naming convention: `{model_type}_{number_of_topics}.pkl`. For instance, you might find files like `LDA_20.pkl`.
 
+## Acknowledgements
+
+This project was built upon the work of the following repositories:
+
+- [Embedded Topic Model Repository](https://github.com/lffloyd/embedded-topic-model/tree/main)
+- [Contextualized Topic Models Repository](https://github.com/MilaNLProc/contextualized-topic-models)
+- [BERTopic Repository](https://github.com/MaartenGr/BERTopic/tree/master)
+- [tomotopy Repository](https://github.com/bab2min/tomotopy)
+
+We extend our gratitude to the authors of these original repositories for their valuable contributions and inspiration.
+
+
