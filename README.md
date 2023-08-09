@@ -12,7 +12,7 @@ To run the app interface locally with the default Congressional Bill dataset, fo
 
 ```
 cd flask_app
-flask run -p <your port number>
+flask run -p <your_port_number>
 ```
 
 To process your own dataset, run the following command to see the available arguments and options:
