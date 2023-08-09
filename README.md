@@ -55,7 +55,6 @@ Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookf
    To train a topic model, run
 ```
 cd Topic_Models
-
 python train_save_topic_model.py --num_topics <number_of_topics> \ 
 --num_iters <number_of_training_iterations> \
 --model_type <LDA_or_SLDA_or_ETM_or_CTM_or_Bertopic_or_PLDA_or_LLDA> \
