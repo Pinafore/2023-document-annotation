@@ -27,7 +27,7 @@ http://www.congressionalbills.org
 Code book to match topics: https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf
 ```
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1I_paD2g21C24Mdzu0DdqCThMu6znCl2Y/view?usp=sharing/]
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/Pinafore/2023-document-annotation/blob/working-app/synthetic_experiment.ipynb]
 
 ## Pipeline
 
