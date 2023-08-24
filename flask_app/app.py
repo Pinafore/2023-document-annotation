@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash, ses
 from .backend_server import User
 # import random
 import sqlite3
-from .tools import *
+# from .tools import *
 import json
 from flask_session import Session
 # import requests
