@@ -1,0 +1,7 @@
+user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
+19,710,hospitals,-1,-1,-1,0:00:25,0,14,858,Public Lands and Water Management
+19,710,hospitals,-1,-1,-1,0:01:37,0,14,2106,Public Lands and Water Management
+19,2106,food,0.15315718763994626,0.49291099457951515,0.03717904718177592,0:00:14,0,24,1988,Civil Rights, Minority Issues, and Civil Liberties
+19,1988,daniel,0.18674429019256605,0.5883994882882536,0.07543281450824477,0:00:15,0,11,500,Macroeconomics
+19,500,texas,0.19122257053291536,0.6230901097419451,0.07903010550166936,0:00:09,0,11,370,Macroeconomics
+19,370,science,0.19346171070309,0.6195456070317027,0.0794640602450597,0:00:07,0,11,1847,Macroeconomics

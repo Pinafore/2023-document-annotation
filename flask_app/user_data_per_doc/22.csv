@@ -1,0 +1,5 @@
+user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
+22,1631,food,-1,-1,-1,0:00:06,0,3,929,Civil Rights, Minority Issues, and Civil Liberties
+22,929,science,0.14330497089117777,0.441698889418578,0.010857051559247174,0:00:16,0,3,427,Energy
+22,427,food,0.1580832960143305,0.4932713436606651,0.02681317183196148,0:00:05,0,22,116,Public Lands and Water Management
+22,1166,science,0.154948499776086,0.5008956560680698,0.02534858260448493,0:00:04,0,22,708,Public Lands and Water Management
