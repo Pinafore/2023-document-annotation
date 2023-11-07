@@ -33,24 +33,58 @@ pip install -r requirements.txt
 ```
 
 ## Setup
+
+#### Data Preprocessing
 Preprocess the data for topic model training. The processed data will be saved to the specified --new_json_path directory
 ```
 ./01_data_process.sh
 ```
 
-Train topic models Download trained topic models from mywebs.com Or train your own models locally with the following script
+#### Training Topic Models
+
+You can obtain trained topic models in two ways:
+
+1. If you're looking to get started quickly without training your own models, we've got you covered. Pre-trained models on the bills dataset, configured with 35 topics, are ready for use. You can download these models directly from [Google Drive](https://drive.google.com/drive/folders/1-k6YcC2KLp8iULGF5zmpAYlpk49dbX4W?usp=sharing)
+
+
+After downloading, place the model files in the following directory of your local repository:
 ```
+./flask_app/Topic_Models/trained_Models/
+```
+
+2. Train Your Own Models
+
+For those who need customized topic models, we provide a convenient script to facilitate the training process:
+
+```bash
 ./02_train_model.sh
 ```
 
-Note: Models will be saved to the save_trained_model_path. Three trained models on the bills dataset are in [here](https://drive.google.com/drive/folders/1-k6YcC2KLp8iULGF5zmpAYlpk49dbX4W?usp=sharing). If downloading a trained model, place it in the ./flask_app/Topic_Models/trained_Models directory. The default number of topics loaded for this app is 35. If you wish to use a different number of topics, train the topic models accordingly, and update line 128 in app.py to reflect the desired number of topics.
+This script will lead you through the steps necessary to train new models, which will then be saved to the location specified by the bash script argument `save_trained_model_path`.
 
-Run the web application
-```
+**Configuration Note:**
+The application defaults to using 35 topics for model training. If your requirements differ, please follow these steps to ensure compatibility:
+
+1. Execute the model training script with the number of topics set to your preference.
+2. Once training is complete, adjust the code in `app.py` to align with your model's topic count. Specifically, change the value on line 128 to correspond with the number of topics in your newly trained model.
+
+
+#### Starting the Web Application
+
+To launch the web application on your local machine, execute the provided shell script by running the following command in your terminal:
+
+```bash
 ./03_run_app.sh
 ```
 
-Then, open a browser and go to localhost:5050 or specify the port you want.
+Upon successful execution of the script, the web application will be available. You can access it by opening your web browser and navigating to:
+
+```
+http://localhost:5050
+```
+
+If you wish to use a different port than the default `5050`, ensure that the `03_run_app.sh` script is configured accordingly before starting the application.
+
 
 
 ## Dataset Information
