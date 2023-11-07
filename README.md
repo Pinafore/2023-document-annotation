@@ -1,94 +1,52 @@
-# Document Annotation App
+# TENOR: Efficient Document Labeling Tool to Exploratory Data Analysis
 
-Welcome to the Document Annotation NLP Tool – an NLP topic modeling tool with active learning, designed to streamline document labeling.
+:fire:
+TENOR is a user interface for speeding up document labeling process and reducing the number of documents needed to be labeled. See the paper for details:
+- Poursabzi-Sangdeh, Forough, et al. (2016). Alto: Active learning with topic overviews for speeding label induction and document labeling. ACL. https://aclanthology.org/P16-1110.pdf
+
 
 ## Getting Started
 
-To run the app interface locally with the default Congressional Bill dataset, follow these steps:
+This tool's frontend code interface is adopted from [this repository](https://github.com/daniel-stephens/community_resilience). To run the app interface locally with the default Bills dataset, follow these steps:
 
-1. Open your terminal.
-2. Navigate to the `flask_app` directory using the `cd` command.
-3. Run the following command, replacing `<your port number>` with your desired port number:
 
-```
-cd flask_app
-flask run -p <your port number>
+```bash
+git clone https://github.com/daniel-stephens/community_resilience.git
+cd 2023-document-annotation
+pip install -r requirements.txt
 ```
 
-To process your own dataset, run the following command to see the available arguments and options:
+# Setup
+Preprocess the data for topic model training. The processed data will be saved to the specified --new_json_path directory
+```
+./01_data_process.sh
+```
 
+Train topic models Download trained topic models from mywebs.com Or train your own models locally with the following script
 ```
-python data_process.py --help
+./02_train_model.sh
 ```
+
+Note: Models will be saved to the save_trained_model_path. If downloading a trained model, place it in the ./flask_app/Topic_Models/trained_Models directory. The default number of topics loaded for this app is 35. If you wish to use a different number of topics, train the topic models accordingly, and update line 128 in app.py to reflect the desired number of topics.
+
+# Run the web application
+```
+./03_run_app.sh
+```
+
+Then, open a browser and go to localhost:5050 or specify the port you want.
+
 
 ## Dataset Information
 
 This app supports two datasets:
 
-1. **20newsgroup**: A dataset of newsgroup documents.
-2. **congressional_bill_project_dataset**: A dataset of Congressional Bill documents.
+1. **20newsgroup**: A collection of newsgroup documents.
+2. **congressional_bill_project_dataset**: A compilation of Congressional Bill documents.
 
-For the Congressional Bill dataset, the app uses data from the following sources:
+For the Congressional Bill dataset, the app utilizes data from these sources:
+
 - [Comparative Agendas Project](https://www.comparativeagendas.net/us)
 - [Congressional Bills](http://www.congressionalbills.org)
 
-To align topics with labels, refer to the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
-
-## Run in Colab
-
-You can also access the app using Google Colab. Click the badge below to open the app notebook:
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Pinafore/2023-document-annotation/blob/working-app/synthetic_experiment.ipynb)
-
-## Pipeline
-
-### Step 1: Data Preprocessing
-
-To preprocess your dataset for analysis, follow these steps:
-
-1. Ensure your dataset is in JSON format, readable by [pandas](https://pandas.pydata.org/docs/reference/api/pandas.read_json.html).
-2. Your dataset table should have the columns: `text`, `label`, and `sub_labels`.
-3. Run the preprocessing script:
-
-  ```
-  cd Topic_Models
-  python data_process.py 
-  ```
-
-### Step 2: Topic Model Training
-
-Choose from a range of topic models and train them using your preprocessed data:
-
-- LDA (Latent Dirichlet Allocation)
-- Supervised LDA
-- Embedded Topic Model
-- Contextualized Topic Model
-- Bertopic
-- Partially Labeled LDA
-- Labeled LDA
-
-Run the training script with appropriate arguments:
-
-```
-cd Topic_Models
-
-python train_save_topic_model.py --num_topics <number_of_topics> \ 
---num_iters <number_of_training_iterations> \
---model_type <LDA_or_SLDA_or_ETM_or_CTM_or_Bertopic_or_PLDA_or_LLDA> \
---load_data_path <Processed_pickle_data_path>
---num_topics <number_of_topics>
---raw_text_path <json_file_path_filtered_by_data_process.py>
-```
-
-### Step 3: Synthetic Experiment
-
-To reproduce the synthetic experiment, first train your model using Step 1 or Step 2. Then, open `synthetic_experiment.ipynb` to run the models.
-
-### Step 4: Plotting Results
-
-To visualize the synthetic experiment results, navigate to `new_model_plot.ipynb`. This notebook allows you to read and plot the saved results.
-
-## Trained Topic Models
-
-All trained topic models are saved in the `./Topic_Models/Model/` directory. Model files are stored in pickle format and follow the naming convention: `{model_type}_{number_of_topics}.pkl`. For instance, you might find files like `LDA_20.pkl`.
-
+To correlate topics with labels, consult the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
