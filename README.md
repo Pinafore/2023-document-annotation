@@ -103,27 +103,18 @@ To correlate topics with labels, consult the [Codebook](https://comparativeagend
 
 ## Interface Demonstration
 
-### List Interface
-<img src="/results/images/list1.jpg" alt="List Interface" width="500" title="List Interface"/>
+<p align="center">
+  <img src="/results/images/list1.jpg" alt="List Interface" width="700" title="List Interface"/>
+  <br>
+  <em>The List Interface provides a streamlined overview of documents grouped by topics.</em>
+</p>
 
-Here we see the interface for listing items. The clean layout and intuitive design make navigation straightforward.
+<p align="center">
+  <img src="/results/images/doc1.jpg" alt="Document Interface" width="700" title="Document Interface"/>
+  <br>
+  <em>The Document Interface offers an immersive reading experience, providing ranked relevant topics and automatic highlights of keywords in the document.</em>
+</p>
 
-### Document Interface
-<img src="/results/images/doc1.jpg" alt="Document Interface" width="500" title="Document Interface"/>
-
-This image showcases the document viewing interface, where users can read and interact with the content efficiently.
-
-
-
-## Contributing
-
-We welcome contributions to this project. If you have suggestions for improving the tool or would like to contribute code, documentation, or bug reports, please follow these steps:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a new Pull Request
 
 ## Acknowledgements
 
