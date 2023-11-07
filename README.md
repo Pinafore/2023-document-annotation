@@ -16,7 +16,7 @@ cd 2023-document-annotation
 pip install -r requirements.txt
 ```
 
-# Setup
+## Setup
 Preprocess the data for topic model training. The processed data will be saved to the specified --new_json_path directory
 ```
 ./01_data_process.sh
@@ -50,3 +50,24 @@ For the Congressional Bill dataset, the app utilizes data from these sources:
 - [Congressional Bills](http://www.congressionalbills.org)
 
 To correlate topics with labels, consult the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
+
+## Contributing
+
+We welcome contributions to this project. If you have suggestions for improving the tool or would like to contribute code, documentation, or bug reports, please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Open a new Pull Request
+
+
+## License
+
+This project is licensed under the [MIT License](LICENSE.md) - see the LICENSE file for details.
+
+## Contact
+
+For any additional questions or comments, please contact [zli12321@umd.edu].
+
+Thank you for using or contributing to the Document Annotation NLP Tool!
