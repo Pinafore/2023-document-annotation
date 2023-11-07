@@ -42,7 +42,7 @@ Train topic models Download trained topic models from mywebs.com Or train your o
 ./02_train_model.sh
 ```
 
-Note: Models will be saved to the save_trained_model_path. If downloading a trained model, place it in the ./flask_app/Topic_Models/trained_Models directory. The default number of topics loaded for this app is 35. If you wish to use a different number of topics, train the topic models accordingly, and update line 128 in app.py to reflect the desired number of topics.
+Note: Models will be saved to the save_trained_model_path. Three trained models on the bills dataset are in [here](https://drive.google.com/drive/folders/1-k6YcC2KLp8iULGF5zmpAYlpk49dbX4W?usp=sharing). If downloading a trained model, place it in the ./flask_app/Topic_Models/trained_Models directory. The default number of topics loaded for this app is 35. If you wish to use a different number of topics, train the topic models accordingly, and update line 128 in app.py to reflect the desired number of topics.
 
 Run the web application
 ```
@@ -79,10 +79,7 @@ We welcome contributions to this project. If you have suggestions for improving 
 ## Acknowledgements
 
 This project was built upon the work of the following repositories:
-
-- [Embedded Topic Model Repository](https://github.com/lffloyd/embedded-topic-model/tree/main)
 - [Contextualized Topic Models Repository](https://github.com/MilaNLProc/contextualized-topic-models)
-- [BERTopic Repository](https://github.com/MaartenGr/BERTopic/tree/master)
 - [tomotopy Repository](https://github.com/bab2min/tomotopy)
 
 We extend our gratitude to the authors of these original repositories for their valuable contributions and inspiration.
