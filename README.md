@@ -79,8 +79,8 @@ We welcome contributions to this project. If you have suggestions for improving 
 ## Acknowledgements
 
 This project was built upon the work of the following repositories:
-- [Contextualized Topic Models Repository](https://github.com/MilaNLProc/contextualized-topic-models)
-- [tomotopy Repository](https://github.com/bab2min/tomotopy)
+- [Contextualized Topic Models](https://github.com/MilaNLProc/contextualized-topic-models)
+- [Tomotopy](https://github.com/bab2min/tomotopy)
 
 We extend our gratitude to the authors of these original repositories for their valuable contributions and inspiration.
 
