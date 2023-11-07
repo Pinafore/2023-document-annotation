@@ -104,13 +104,13 @@ To correlate topics with labels, consult the [Codebook](https://comparativeagend
 ## Interface Demonstration
 
 <p align="center">
-  <img src="/results/images/list3.png" alt="List Interface" width="700" title="List Interface"/>
+  <img src="/results/images/list3.png" alt="List Interface" width="900" title="List Interface"/>
   <br>
   <em>The List Interface provides a streamlined overview of documents grouped by topics.</em>
 </p>
 
 <p align="center">
-  <img src="/results/images/doc3.png" alt="Document Interface" width="700" title="Document Interface"/>
+  <img src="/results/images/doc3.png" alt="Document Interface" width="900" title="Document Interface"/>
   <br>
   <em>The Document Interface offers an immersive reading experience, providing ranked relevant topics and automatic highlights of keywords in the document.</em>
 </p>
