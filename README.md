@@ -26,7 +26,7 @@ This tool's frontend code interface is adopted from [this repository](https://gi
 
 
 ```bash
-git clone https://github.com/daniel-stephens/community_resilience.git
+git clone [https://github.com/daniel-stephens/community_resilience.git](https://github.com/Pinafore/2023-document-annotation.git)
 cd 2023-document-annotation
 pip install -r requirements.txt
 ```
