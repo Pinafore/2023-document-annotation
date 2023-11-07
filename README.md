@@ -5,6 +5,21 @@ TENOR is a user interface for speeding up document labeling process and reducing
 - Poursabzi-Sangdeh, Forough, et al. (2016). Alto: Active learning with topic overviews for speeding label induction and document labeling. ACL. https://aclanthology.org/P16-1110.pdf
 
 
+## References
+
+If you find this tool helpful, you can cite the following paper:
+
+```bibtex
+@inproceedings{poursabzi2016alto,
+  title={Alto: Active learning with topic overviews for speeding label induction and document labeling},
+  author={Poursabzi-Sangdeh, Forough and Boyd-Graber, Jordan and Findlater, Leah and Seppi, Kevin},
+  booktitle={Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages={1158--1169},
+  year={2016}
+}
+```
+
+
 ## Getting Started
 
 This tool's frontend code interface is adopted from [this repository](https://github.com/daniel-stephens/community_resilience). To run the app interface locally with the default Bills dataset, follow these steps:
@@ -61,6 +76,16 @@ We welcome contributions to this project. If you have suggestions for improving 
 4. Push to the branch (`git push origin feature/YourFeature`)
 5. Open a new Pull Request
 
+## Acknowledgements
+
+This project was built upon the work of the following repositories:
+
+- [Embedded Topic Model Repository](https://github.com/lffloyd/embedded-topic-model/tree/main)
+- [Contextualized Topic Models Repository](https://github.com/MilaNLProc/contextualized-topic-models)
+- [BERTopic Repository](https://github.com/MaartenGr/BERTopic/tree/master)
+- [tomotopy Repository](https://github.com/bab2min/tomotopy)
+
+We extend our gratitude to the authors of these original repositories for their valuable contributions and inspiration.
 
 ## License
 
