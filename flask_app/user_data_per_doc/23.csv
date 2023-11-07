@@ -1,4 +1,0 @@
-user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
-23,537,texas,-1,-1,-1,0:00:08,0,15,210,Public Lands and Water Management
-23,1683,food,0.18943125839677563,0.4658125831651972,0.06827728672986925,0:00:04,0,13,1988,Education
-23,2214,science,0.18853560232870578,0.6098767750603123,0.06491340734730873,0:00:14,0,19,370,Health
