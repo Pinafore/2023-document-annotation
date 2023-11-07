@@ -3,5 +3,5 @@ tomotopy
 pandas
 scikit-learn
 torch
-spacy
+spacy==3.5.3
 contextualized_topic_models
