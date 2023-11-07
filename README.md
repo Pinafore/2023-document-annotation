@@ -101,6 +101,20 @@ For the Congressional Bill dataset, the app utilizes data from these sources:
 
 To correlate topics with labels, consult the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
 
+## Interface Demonstration
+
+### List Interface
+<img src="/results/images/list1.jpg" alt="List Interface" width="500" title="List Interface"/>
+
+Here we see the interface for listing items. The clean layout and intuitive design make navigation straightforward.
+
+### Document Interface
+<img src="/results/images/doc1.jpg" alt="Document Interface" width="500" title="Document Interface"/>
+
+This image showcases the document viewing interface, where users can read and interact with the content efficiently.
+
+
+
 ## Contributing
 
 We welcome contributions to this project. If you have suggestions for improving the tool or would like to contribute code, documentation, or bug reports, please follow these steps:
