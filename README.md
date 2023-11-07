@@ -29,7 +29,7 @@ Train topic models Download trained topic models from mywebs.com Or train your o
 
 Note: Models will be saved to the save_trained_model_path. If downloading a trained model, place it in the ./flask_app/Topic_Models/trained_Models directory. The default number of topics loaded for this app is 35. If you wish to use a different number of topics, train the topic models accordingly, and update line 128 in app.py to reflect the desired number of topics.
 
-# Run the web application
+Run the web application
 ```
 ./03_run_app.sh
 ```
