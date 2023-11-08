@@ -99,7 +99,7 @@ For the Congressional Bill dataset, the app utilizes data from these sources:
 - [Comparative Agendas Project](https://www.comparativeagendas.net/us)
 - [Congressional Bills](http://www.congressionalbills.org)
 
-To correlate topics with labels, consult the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
+The original Bills dataset uses numbers as labels. To correlate topics with labels, consult the [Codebook](https://comparativeagendas.s3.amazonaws.com/codebookfiles/Codebook_PAP_2019.pdf).
 
 ## Interface Demonstration
 
