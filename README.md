@@ -60,7 +60,7 @@ For those who need customized topic models, we provide a convenient script to fa
 ./02_train_model.sh
 ```
 
-This script will lead you through the steps necessary to train new models, which will then be saved to the location specified by the bash script argument `save_trained_model_path`.
+This script will lead you through the steps necessary to train new models, which will then be saved to the location specified in the bash script argument `--save_trained_model_path`.
 
 **Configuration Note:**
 The application defaults to using 35 topics for model training. If your requirements differ, please follow these steps to ensure compatibility:
