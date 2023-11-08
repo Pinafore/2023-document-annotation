@@ -94,7 +94,7 @@ This app supports two datasets:
 1. **20newsgroup**: A collection of newsgroup documents.
 2. **congressional_bill_project_dataset**: A compilation of Congressional Bill documents.
 
-For the Congressional Bill dataset, the app utilizes data from these sources:
+For the Congressional Bill dataset, the app uses data from these sources:
 
 - [Comparative Agendas Project](https://www.comparativeagendas.net/us)
 - [Congressional Bills](http://www.congressionalbills.org)
