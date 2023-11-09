@@ -282,7 +282,8 @@ class Topic_Model():
         if not self.load_model:
             doc_prob_topic = []
             doc_to_topics, topics_probs = {}, {}
-            for doc_id, doc in enumerate(self.maked_docs):
+            print('Sorting document and topic probabilities...')
+            for doc_id, doc in tqdm(enumerate(self.maked_docs)):
                 # if self.model_type == 'SLDA':
                 #     inferred = self.model.estimate(doc)
                 # else:
