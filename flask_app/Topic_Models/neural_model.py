@@ -134,7 +134,8 @@ class Neural_Model():
         doc_prob_topic = []
         doc_to_topics, topics_probs = {}, {}
 
-        for doc_id, inferred in enumerate(model_inferred):
+        print('sorting topic and document probabilities...')
+        for doc_id, inferred in tqdm(enumerate(model_inferred)):
             doc_topics = list(enumerate(inferred))
             doc_prob_topic.append(inferred)
 
