@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import os
 import json
+from tqdm import tqdm
 
 
 '''
@@ -35,7 +36,11 @@ class Preprocessing():
         nlp = spacy.load('en_core_web_sm')
         nlp.add_pipe('sentencizer')
 
-        docs = [nlp(x) for x in data]
+        docs = []
+        # Wrap `tqdm` around `data` to create a progress bar
+        for doc in tqdm(data):
+            # Process each item with `nlp` and append to `docs` list
+            docs.append(nlp(doc))
 
 
         print('expanding stopwords')
