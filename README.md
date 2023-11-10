@@ -34,13 +34,13 @@ pip install -r requirements.txt
 
 ## Setup
 
-#### Data Preprocessing
+#### 1. Data Preprocessing
 Preprocess the data for topic model training. The processed data will be saved to the specified --new_json_path directory
 ```
 ./01_data_process.sh
 ```
 
-#### Training Topic Models
+#### 2. Training Topic Models
 
 You can obtain trained topic models in two ways:
 
@@ -69,7 +69,7 @@ The application defaults to using 35 topics for model training. If your requirem
 2. Once training is complete, adjust the code in `app.py` to align with your model's topic count. Specifically, change the value on line 128 to correspond with the number of topics in your newly trained model.
 
 
-#### Starting the Web Application
+#### 3. Starting the Web Application
 
 To launch the web application on your local machine, execute the provided shell script by running the following command in your terminal:
 
