@@ -1,4 +1,4 @@
-# TENOR: Efficient Document Labeling Tool to Exploratory Data Analysis
+# TENOR: Efficient Document Labeling/Topic Modeling Tool to Exploratory Data Analysis
 
 :fire:
 TENOR is a user interface for speeding up document labeling process and reducing the number of documents needed to be labeled. See the paper for details:
