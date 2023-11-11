@@ -185,10 +185,16 @@ class Active_Learning():
     '''
     def fit_classifier(self, initialized= False):
         if initialized:
-            for i in range(len(self.labels_track)):
-                self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            # for i in range(len(self.labels_track)):
+                # self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            
+            self.classifier.fit(self.documents_track, self.labels_track)
         else:
-            self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            # for i in range(len(self.labels_track)//10):
+            # if self.num_docs_labeled % 10 == 0:
+            # self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            self.classifier = self.initialize_classifier()
+            self.classifier.fit(self.documents_track, self.labels_track)
 
         self.update_classifier()
 
