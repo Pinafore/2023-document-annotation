@@ -11,7 +11,19 @@ from scipy.sparse import csr_matrix, hstack
 import copy
 from utils.tools import group_docs_to_topics
 import logging
+import os, sys
+from contextlib import contextmanager
 
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, 'w') as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 
 '''
@@ -303,10 +315,10 @@ class Active_Learning():
     '''
     def eval_classifier(self, reference_labels):
         local_training_preds = self.classifier.predict(self.text_vectorizer[0:self.num_docs])
-
-        classifier_purity = purity_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
-        classifier_RI = adjusted_rand_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
-        classifier_NMI = adjusted_mutual_info_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
+        with suppress_stdout():
+            classifier_purity = purity_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
+            classifier_RI = adjusted_rand_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
+            classifier_NMI = adjusted_mutual_info_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
 
          
         logging.info('purity {}; RI {}; NMI {}'.format(classifier_purity, classifier_RI, classifier_NMI))
