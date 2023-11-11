@@ -80,10 +80,10 @@ To launch the web application on your local machine, execute the provided shell 
 Upon successful execution of the script, the web application will be available. You can access it by opening your web browser and navigating to:
 
 ```
-http://localhost:5050
+http://localhost:5001
 ```
 
-If you wish to use a different port than the default `5050`, ensure that the `03_run_app.sh` script is configured accordingly before starting the application.
+If you wish to use a different port than the default `5001`, ensure that the `03_run_app.sh` script is configured accordingly before starting the application.
 
 
 
