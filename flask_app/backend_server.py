@@ -1,52 +1,38 @@
-# from spacy_topic_model import TopicModel
-import sys
-sys.path.append('../')
-from Topic_Models.topic_model import Topic_Model
-from .classifier import Active_Learning
+from classifier import Active_Learning
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from Topic_Models.Neural_Topic_Model import Neural_Model
 import pickle
 from multiprocessing import Process, Manager
 import copy
 import random
 import os
-
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-topic_models_dir = os.path.dirname(current_dir)
-
-
-'''
-Replace it with the path of your dataset
-'''
-# doc_dir = os.path.join(topic_models_dir,'Topic_Models/Data/congressional_bill_train.json')
-# processed_doc_dir = os.path.join(topic_models_dir,'Topic_Models/Data/congressional_bill_train_processed.pkl')
-doc_dir = os.path.join(topic_models_dir,'Topic_Models/Data/congressional_bill_train.json')
-processed_doc_dir = os.path.join(topic_models_dir,'Topic_Models/Data/congressional_bill_train_processed.pkl')
-model_types_map = {0: 'LA' , 1: 'LDA', 2: 'SLDA', 3: 'CTM'}
-num_iter = 1500
-load_data = True
-save_model = False
-num_topics =30
-inference_alg = 'logreg'
-test_dataset_name = os.path.join(topic_models_dir,'Topic_Models/Data/congressional_bill_train_test_test.json')
-USE_TEST_DATA = False
-table = pd.read_json(doc_dir)
-training_length = len(table)
-
+from Topic_Models.classical_topic_model import Topic_Model
+from Topic_Models.neural_model import Neural_Model
+import logging
 
 
 class User():
     '''
     Initialize a user session with needed elements
     '''
-    def __init__(self, mode, user_id):
-        self.mode = mode
+    def __init__(self, user_id, raw_texts, model_type, num_topics=35, data_path='./flask_app/Data/bills/congressional_bill_train_processed.pkl', labels=None):
+        '''
+        user_id: the id of the user in the database
+        raw_texts: all the raw texts in a list
+        model: the type of model can be LDA, SLDA, or CTM
+        num_topics: the number of topics for the topic model
+        data_path: the path of the processed dataset
+        labels: If you have groundtruth labels and want to measure purity, randindex, and NMI, pass them as a list to 
+        the parameter. Else, leave it to be None
+        '''
+        self.labels = labels if labels is not None else ['null' for i in raw_texts]
         self.user_id = user_id
-        self.df = pd.read_json(doc_dir)
-        self.raw_texts = self.df.text.values.tolist()[0:training_length]
-        self.test_df = None
+        self.raw_texts = raw_texts
+        self.data_path = data_path
+        self.slda_save_path = './flask_app/Topic_Models/trained_models/SLDA_user{}.pkl'.format(self.user_id)
+        '''
+        Here we use TFIDF unigram as embeddings for the classifier
+        '''
         self.vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, ngram_range=(1,1))
         self.updated_model = False
         self.click_tracks = {}
@@ -54,67 +40,33 @@ class User():
         self.purity = -1
         self.RI = -1
         self.NMI = -1
-        
-        if USE_TEST_DATA:
-            self.test_df = pd.read_json(test_dataset_name)
-            test_texts = self.test_df.text.values.tolist()
-            self.raw_texts.extend(test_texts)
-            self.vectorizer_idf = self.vectorizer.fit_transform(self.raw_texts)
-        else:
-            self.vectorizer_idf = self.vectorizer.fit_transform(self.df.text.values.tolist())
+        self.model_type = model_type
 
-        
-
-
-            
-        
+        self.vectorizer_idf = self.vectorizer.fit_transform(raw_texts)
         self.user_labels = set()
 
-        if mode != 0:
-            if mode == 1 or mode == 2:
-                self.update_process = None
-                self.model = Topic_Model(num_topics, 0, model_types_map[mode], processed_doc_dir, training_length, {}, True, os.path.join(topic_models_dir,'Topic_Models/Model/{}_{}.pkl'.format(model_types_map[mode], num_topics)))
-                self.topics = self.model.print_topics(verbose=False)
+        if model_type == 'LDA' or model_type == 'SLDA' or model_type == 'CTM':
+            self.update_process = None
+
+            model_path = './flask_app/Topic_Models/trained_models/{}_{}.pkl'.format(model_type, num_topics)
+            if model_type == 'CTM':
+                self.model = Neural_Model(load_model=True, load_data_path=data_path, model_path=model_path, model_type=model_type)
+            else:
+                self.model = Topic_Model(load_model=True, load_data_path=data_path, model_path=model_path, model_type=model_type)
+            self.topics = self.model.print_topics(verbose=False)
                
 
-                concatenated_features = self.model.concatenate_features(self.model.doc_topic_probas, self.vectorizer_idf)
-                self.concatenated_features = concatenated_features
-
-                self.string_topics = {str(k): v for k, v in self.topics.items()}
+            # concatenated_features = self.model.concatenate_features(self.model.doc_topic_probas, self.vectorizer_idf)
+            # self.concatenated_features = concatenated_features
+            self.string_topics = {str(k): v for k, v in self.topics.items()}  
+            self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
                 
-            
-                self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
-                
+            logging.info(f'Using model {model_type}')
 
-                
-                # self.word_topic_distributions = self.model.word_topic_distribution
-                
-                print('Mode {}'.format(model_types_map[mode]))
-                # print(self.document_probas)
-
-                self.alto = Active_Learning(self.raw_texts, copy.deepcopy(self.document_probas), self.doc_topic_probas, self.df, inference_alg, self.concatenated_features, training_length, 1, self.test_df, None)
-            elif mode == 3:
-                self.model = Neural_Model(os.path.join(topic_models_dir,'Topic_Models/Model/{}_{}.pkl'.format(model_types_map[mode], num_topics)), processed_doc_dir, doc_dir)
-                self.topics = self.model.print_topics(verbose=False)
-
-              
-
-                concatenated_features = self.model.concatenate_features(self.model.doc_topic_probas, self.vectorizer_idf)
-                self.concatenated_features = concatenated_features
-
-
-                self.string_topics = {str(k): v for k, v in self.topics.items()}
-                # print(self.string_topics)
-                self.document_probas, self.doc_topic_probas = self.model.document_probas, self.model.doc_topic_probas
-                # self.word_topic_distributions = self.model.word_topic_distribution
-
-                self.alto = Active_Learning(self.raw_texts, copy.deepcopy(self.document_probas),  self.doc_topic_probas, self.df, inference_alg, self.concatenated_features, training_length, 1, self.test_df, None)
+            self.alto = Active_Learning(copy.deepcopy(self.document_probas), self.vectorizer_idf, self.doc_topic_probas)
         else:
-            # self.len_list = list(range(len(self.df)))
-            len_list = list(range(len(self.df)))
-            self.len_list = random.sample(len_list, len(len_list))
-            self.alto = Active_Learning(self.raw_texts, None,  None, self.df, inference_alg, self.vectorizer_idf, training_length, 0, self.test_df, None)
-
+            raise('Unsupported Model Type')
+      
 
     '''
     Fetch the document information given a document id. 
@@ -124,7 +76,7 @@ class User():
         
         self.click_tracks[str(doc_id)] = 'click'
 
-        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+        if self.model_type == 'LDA' or self.model_type == 'SLDA' or self.model_type == 'CTM':
             topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
             result['topic_order'] = topic_distibution
             # result['topic_keywords'] = topic_keywords
@@ -133,18 +85,17 @@ class User():
             if len(self.user_labels) >= 2:
                 preds, dropdown = self.alto.predict_label(int(doc_id))
                 result['prediction'] = preds
-                # result['dropdown'] = dropdown
-                # result['dropdowns'] = 
+                result['dropdown'] = dropdown
             else:
-                result['prediction'] = 'No Prediction'
-                # result['dropdown'] = []
-            # print('result', result)
+                result['prediction'] = ['']
+                result['dropdown'] = []
+            # logging.info('result', result)
 
             return result
-        elif self.mode ==0:
+        elif self.model_type == 'no_topic':
             preds, dropdown = self.alto.predict_label(int(doc_id))
             result['prediction'] = preds
-            # result['dropdown'] = dropdown
+            result['dropdown'] = dropdown
 
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics
@@ -169,73 +120,49 @@ class User():
     def sub_roundtrip(self, label, doc_id, response_time):
         result = dict()
         self.click_tracks[str(doc_id)] = 'label, recommended {}'.format(self.alto.last_recommended_doc_id)
-        if self.mode == 2:
+
+        if self.model_type == 'SLDA' or self.model_type == 'LDA' or self.model_type == 'CTM':
             if isinstance(label, str):
-                print('calling self.label...')
+                logging.info('calling self.label...')
                 self.user_labels.add(label)
                 self.alto.label(int(doc_id), label)
                         
-            
-            # print(self.topics)
-            random_document, _ = self.alto.recommend_document(True)
+            selected_document, _ = self.alto.recommend_document(True)
              
-            result['document_id'] = str(random_document)
+            result['document_id'] = str(selected_document)
                     
-            # print(result)
-            print('unique user labels length is {}'.format(len(self.user_labels)))
+            logging.info('unique label classes is {}'.format(len(self.user_labels)))
             if len(self.user_labels) >= 2:
-                local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI = self.alto.eval_classifier()
-                self.purity = purity
-                self.RI = RI
-                self.NMI = NMI
-                return local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI, result
+                user_purity, user_RI, user_NMI = self.alto.eval_classifier(self.labels)
+                self.purity = user_purity
+                self.RI = user_RI
+                self.NMI = user_NMI
+                return user_purity, user_RI, user_NMI, result
             else:
-                return -1, -1, -1, -1, -1, -1, -1, -1, result
-        elif self.mode == 1 or self.mode == 3:
-            if isinstance(label, str):
-                print('calling self.label...')
-                self.user_labels.add(label)
-                self.alto.label(int(doc_id), label)
-                    
-            
-            # print(self.topics)
-            random_document, _ = self.alto.recommend_document(True)
-            
-            # result['raw_text'] = str(random_document)
-            result['document_id'] = str(random_document)
-                    
-                
-            # print(result)
-            print('unique user labels length is {}'.format(len(self.user_labels)))
-            if len(self.user_labels) >= 2:
-                local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI = self.alto.eval_classifier()
-                self.purity = purity
-                self.RI = RI
-                self.NMI = NMI
-                return local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI, result
-            else:
-                return -1, -1, -1, -1, -1, -1, -1, -1, result
-        elif self.mode == 0:
+                '''
+                If classifier is not initialized yet, all metrics are -1
+                '''
+                return -1, -1, -1, result
+        elif self.model_type == 'no_topic':
             if isinstance(label, str):
                 self.user_labels.add(label)
                 self.alto.label(int(doc_id), label)
                     
-        
-
-            random_document, _ = self.alto.recommend_document(True)
+            selected_document, _ = self.alto.recommend_document(True)
             
             # result['raw_text'] = str(random_document)
-            result['document_id'] = str(random_document)
+            result['document_id'] = str(selected_document)
 
-            print('unique user labels length is {}'.format(len(self.user_labels)))
+            logging.info('unique user labels length is {}'.format(len(self.user_labels)))
             if len(self.user_labels) >= 2:
-                local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI = self.alto.eval_classifier()
-                self.purity = purity
-                self.RI = RI
-                self.NMI = NMI
-                return local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI, result
+                user_purity, user_RI, user_NMI = self.alto.eval_classifier(self.labels)
+                self.purity = user_purity
+                self.RI = user_RI
+                self.NMI = user_NMI
+                return user_RI, user_NMI, result
             else:
-                return -1, -1, -1, -1, -1, -1, -1, -1, result
+                return -1, -1, -1, result
+
 
     '''
     Retrive the document informaton-topic orders, predictions from the classifier
@@ -243,32 +170,26 @@ class User():
     '''      
     def get_doc_information_to_save(self, doc_id):
         result = dict()
-        print('getting document information to save...')
-        print('mode is ', self.mode)
-        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+        logging.info('getting document information to save...')
+        if self.model_type == 'LDA' or self.model_type == 'SLDA' or self.model_type == 'CTM':
             
             topic_distibution, topic_res_num = self.model.predict_doc_with_probs(int(doc_id), self.topics)
             result['topic_order'] = topic_distibution
-            # result['topic_keywords'] = topic_keywords
             result['topics'] = topic_res_num
 
             if len(self.user_labels) >= 2:
                 preds, dropdown = self.alto.predict_label(int(doc_id))
-                # result['dropdown'] = dropdown
                 result['prediction'] = preds
             else:
                 result['prediction'] =['No prediction']
-                # result['dropdown'] = []
 
             return result
-        elif self.mode ==0:
+        elif self.model_type == 'no_topic':
             if len(self.user_labels) >= 2:
                 preds, dropdown = self.alto.predict_label(int(doc_id))
                 result['prediction'] = preds
-                # result['dropdown'] = dropdown
             else:
                 result['prediction'] =['No prediction']
-                # result['dropdown'] = dropdown
             
             result['topics'] = {}
             result['topic_order'] = {}
@@ -279,20 +200,22 @@ class User():
     Reinitialize a slda topic model and train it and save it.
     '''
     def update_slda(self):
-        model = Topic_Model(num_topics, num_iter, model_types_map[self.mode], processed_doc_dir, training_length, self.alto.user_labels, False, None)
-        model.train(os.path.join(topic_models_dir,'Topic_Models/Model/SLDA_user{}.pkl'.format(self.user_id)))
-        # self.update_process.join()
+        classifier_labels = self.alto.classifier.predict(self.alto.text_vectorizer)
+        predicted_labels = {i: classifier_labels[i] for i in range(len(classifier_labels))}
+
+        model = Topic_Model(num_topics=self.num_topics,num_iters=self.num_iter, load_data_path=self.data_path, load_model=False, model_type=self.model_type, user_labels=predicted_labels)
+        model.train(model_path=self.slda_save_path)
 
     '''
     Load the updated SLDA model to the current process
     '''
     def load_updated_model(self):
         try:
-            self.model = Topic_Model(num_topics, 0, model_types_map[self.mode], processed_doc_dir, training_length, {}, True, os.path.join(topic_models_dir,'Topic_Models/Model/SLDA_user{}.pkl'.format(self.user_id)))
+            self.model = Topic_Model(load_model=True, load_data_path=self.data_path, model_path=self.slda_save_path, model_type=self.model_type)
             self.topics = self.model.print_topics(verbose=False)
 
             self.string_topics = {str(k): v for k, v in self.topics.items()}
-            # print(self.string_topics)
+            # logging.info(self.string_topics)
                             
             self.document_probas, self.doc_topic_probas = self.model.group_docs_to_topics()
             
@@ -305,9 +228,9 @@ class User():
 
             self.alto.update_doc_probs(copy.deepcopy(self.document_probas), self.doc_topic_probas)
 
-            print('updated new SLDA model')
+            logging.info('updated new SLDA model')
         except Exception as e:
-            print(f"An error occurred loading: {e}")
+            logging.info(f"An error occurred loading: {e}")
             pass
 
         with Manager() as manager:
@@ -319,10 +242,13 @@ class User():
     the next recommended document. Also loads or train a new SLDA model
     '''
     def round_trip1(self, label, doc_id, response_time):
-        # print('calling round trip')
-        print('alto num docs labeld are', self.alto.num_docs_labeled)
-        if model_types_map[self.mode] == 'SLDA':
-            print('SLDA mode')
+        # logging.info('calling round trip')
+        logging.info('alto num docs labeld are', self.alto.num_docs_labeled)
+        if self.model_type == 'SLDA':
+            logging.info('SLDA mode')
+            '''
+            Start updateing sLDA model as soon as the user labels 4 documents
+            '''
             if self.alto.num_docs_labeled >= 4:
                 if self.update_process is None:
                     self.slda_update_freq += 1
@@ -351,19 +277,19 @@ class User():
     model. and the values are the documents associated with the topic number
     '''
     def get_document_topic_list(self, recommend_action):
-        print('calling get document topic list')
-        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+        logging.info('calling get document topic list')
+
+        if self.model_type == 'LDA' or self.model_type == 'SLDA' or self.model_type == 'CTM':
             document_probas = self.document_probas
+
             result = {}
             cluster = {}
             for k, v in document_probas.items():
                 cluster[str(k)] = [ele[0] for ele in v if not self.alto.is_labeled(int(ele[0]))]
 
             result['cluster'] = cluster
-            # self.doc_topic_distribution = cluster
-
-
-            # print(recommend_result)
+            
+            # logging.info(recommend_result)
             if recommend_action:
                 random_document, _ = self.alto.recommend_document(False)
             else:
@@ -375,8 +301,8 @@ class User():
         else:
             result = {}
             cluster = {}
-            cluster["1"] = self.len_list
-            # print(cluster)
+            cluster["1"] = [i for i in range(len(self.raw_texts))]
+            # logging.info(cluster)
             result['cluster'] = cluster
             if recommend_action:
                 random_document, _ = self.alto.recommend_document(False)
@@ -387,6 +313,7 @@ class User():
             result['keywords'] = {}
            
 
+        
         return result
     
 
@@ -394,8 +321,9 @@ class User():
     check whether the mode is just active learning or with topic model
     '''
     def check_active_list(self):
-        print('calling check active list')
-        if self.mode == 1 or self.mode == 2 or self.mode == 3:
+        logging.info('calling check active list')
+        # print('self.model is', self.model_type)
+        if self.model_type == 'LDA' or self.model_type == 'SLDA' or self.model_type == 'CTM':
             document_probas = self.document_probas
             result = {}
             cluster = {}
@@ -403,17 +331,13 @@ class User():
                 cluster[str(k)] = [ele[0] for ele in v]
 
             result['cluster'] = cluster
-            # self.doc_topic_distribution = cluster
-
-
-
             result['keywords'] = self.string_topics
             
         else:
             result = {}
             cluster = {}
-            cluster["1"] = list(range(len(self.df)))
-            # print(cluster)
+            cluster["1"] = list(range(len(self.raw_texts)))
+            # logging.info(cluster)
             result['cluster'] = cluster
      
             result['keywords'] = {}
@@ -427,10 +351,10 @@ class User():
     '''
     def get_metrics_to_save(self):
         try:
-            local_training_acc, local_testing_preds, purity, RI, NMI, user_purity, user_RI, user_NMI = self.alto.eval_classifier()
-            self.purity = purity
-            self.RI = RI
-            self.NMI = NMI
-            return purity, RI, NMI, user_purity, user_RI, user_NMI
+            user_purity, user_RI, user_NMI = self.alto.eval_classifier(self.labels)
+            self.purity = user_purity
+            self.RI = user_RI
+            self.NMI = user_NMI
+            return user_purity, user_RI, user_NMI
         except:
-            return -1, -1, -1, -1, -1, -1
+            return -1, -1, -1

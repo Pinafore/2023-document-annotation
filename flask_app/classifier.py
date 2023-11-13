@@ -1,112 +1,109 @@
 from sklearn.linear_model import SGDClassifier
-from .utils.tools import purity_score
-from .utils.tools import find_doc_for_TA
-from .utils.tools import remove_value_from_dict_values
-from sklearn.metrics.cluster import normalized_mutual_info_score
-from sklearn.metrics.cluster import rand_score
+from utils.tools import purity_score
+from utils.tools import active_selection
+from utils.tools import remove_value_from_dict_values
+from sklearn.metrics.cluster import adjusted_mutual_info_score
+from sklearn.metrics.cluster import adjusted_rand_score
 from scipy.sparse import vstack
 import numpy as np
-from sklearn.metrics import accuracy_score
 import random
+from scipy.sparse import csr_matrix, hstack
+import copy
+from utils.tools import group_docs_to_topics
+import logging
+import os, sys
+from contextlib import contextmanager
+
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, 'w') as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 
 '''
-whether we use the test dataset for evaluation or not
+We use logistic regression as the classifier with chosen hyperparameters. You could also change the
+of hyperparameters
 '''
-use_test_data = False
-# This variable means if you create a global classifier, then you predeciding there
-# are 20 topics in the classifier. Then test the accuracy of the global classifier
-# on both the training and the testing dataset
-# log_test_data = False
-
-
-# Active Learning
 class Active_Learning():
-    def __init__(self, documents, doc_prob, doc_topic_prob, df, running_type, text_vectorizer, train_len, mode, test_dataset_frame, test_vectorizer):
+    def __init__(self, doc_prob, text_vectorizer, doc_topic_prob=None):
         """
-        Documents: the text corpus
-        Doc_prob: a dictionary contains all the topics. Each topic 
+        doc_prob: a dictionary contains all the topics. Each topic 
         contains a list of documents along with their probabilities 
         belong to a specific topic
-        [topic 1]: [(document a, prob 1), (document b, prob 2)...]
+        {topic 1: [(document a, prob 1), (document b, prob 2)...]
+        ...}
+
+        doc_topic_prob: a list of lists, where each list is the topic probability
+        for a specific document
+
+        text_vectorizer: embeddings of text documents to feed into the classifier
+
+        doc_topic_prob: the document topic probabilities processed when training the model. 
+        If this is not provided, our method will process it for you but takes linger time to initialize
         """
-        # self.classes = list(range(num_topics))
-        # print('mode is {}'.format(mode))
-        self.mode = mode
-        self.docs = documents
         self.num_docs_labeled = 0
         self.last_recommended_topic = None
         self.last_recommended_doc_id = None
         self.recommended_doc_ids = set()
-        self.text_vectorizer = text_vectorizer
 
+        if doc_topic_prob is None:
+            topics_probs, doc_topic_prob= group_docs_to_topics(doc_prob)
 
-        self.train_length = train_len
+        self.num_docs = len(doc_topic_prob)
+
+        '''
+        Concatenate the text vectorizer with the topic probability embeddings
+        '''
+        
+        self.text_vectorizer = hstack([text_vectorizer, csr_matrix(copy.deepcopy(doc_topic_prob)).astype(np.float64)], format='csr')
+
         self.id_vectorizer_map = {}
         '''
         stores the scores of the documents after the user updates the classifier
         '''
         self.scores = []
 
-        # if log_test_data:
-        #     self.test_texts = text_vectorizer[train_len:train_len+100]
 
         '''
         user_labels: labels the user creates for documents the user views
-        curr_label_num: topic numbers computed by LDA
+        curr_label_num: topic numbers computed by topic models
         '''
         self.user_labels = dict()
 
         '''
         Parameters or regressor can be changed later
         '''
-        self.classifier = self.initialize_classifier(running_type)
-
-        if use_test_data:
-            self.test_vectorizer = test_vectorizer
-            self.test_general_labels = test_dataset_frame.label.values.tolist()
-            self.test_sub_labels = test_dataset_frame.sub_labels.values.tolist()
-            self.total_length = train_len + len(test_dataset_frame.text.values.tolist())
+        self.classifier = self.initialize_classifier()
 
 
-        # Stores and track labeled documents and labels
+        '''Stores and track labeled documents and labels'''
         self.documents_track = None
         self.labels_track = []
-        self.general_labels_track = []
 
-        
-        self.df = df
-        self.general_labels = df['label'].tolist()
-        self.specific_labels = df['sub_labels'].tolist()
+
         self.classes = []
-        # self.classes = np.unique(self.specific_labels)
-        
-        '''
-        Mode 1 mean using topic modeling. Otherwise, just use active learning
-        '''
-        if self.mode == 1:
-            self.doc_topic_prob = np.array(doc_topic_prob)
-            # self.sorted_doc_topic_prob = np.sort(self.doc_topic_prob, axis=1)[:, ::-1]
-            self.doc_probs = doc_prob
+
+
+        self.doc_topic_prob = np.array(doc_topic_prob)
+        self.doc_probs = doc_prob
     
     def update_doc_probs(self, doc_prob, doc_topic_prob):            
         self.doc_topic_prob = np.array(doc_topic_prob)
-        # self.sorted_doc_topic_prob = np.sort(self.doc_topic_prob, axis=1)[:, ::-1]
         self.doc_probs = doc_prob
 
-    def initialize_classifier(self, classifier_type: str):
-        classifier_type = classifier_type.lower()
 
-        if classifier_type == 'logreg':
-            return SGDClassifier(loss="log_loss", penalty="l2", tol=1e-3, random_state=42, learning_rate="adaptive", eta0=0.1, validation_fraction=0.2, alpha = 0.00001)
-        elif classifier_type == 'logreg_modal':
-            print('Implement other types')
-            return None
-        else:
-            print('Implement other types')
-            return None
+    def initialize_classifier(self):
+        return SGDClassifier(loss="log_loss", penalty='l2', tol=1e-3, random_state=42, learning_rate="optimal", eta0=0.1, validation_fraction=0.2, alpha = 0.000005)
 
-     
+    '''
+    After selecting the document within a topic, drops it from the list
+    '''
     def update_median_prob(self, topic_num, idx_in_topic):
         try:
             self.doc_probs[topic_num].pop(idx_in_topic)
@@ -116,109 +113,88 @@ class Active_Learning():
 
     '''
     Preference function can be changed or chosen for ActiveLearning
+    Return the recommended document ID from the list index and the 
+    preference function score for the document. The score is -1 if
+    the classifier is not intialized yet
     '''
-    def preference(self, update):
+    def preference(self, update=True):
+        '''
+        If the user only clicks the document, set update to be False
+        '''
         if not update and self.last_recommended_doc_id is not None:
-            # print('return last recommended id')
+            # logging.info('return last recommended id')
             if self.last_recommended_doc_id in self.scores:
                 return self.last_recommended_doc_id, self.scores[self.last_recommended_doc_id]
             return self.last_recommended_doc_id, -1
         
-        if self.mode == 1:
-            if len(self.classes) < 2:
-                chosen_idx = random.randint(0, self.train_length)
 
-                while chosen_idx in self.recommended_doc_ids:
-                    try:
-                        chosen_idx = random.randint(0, self.train_length)
-                    except Exception as e: 
-                        print(e)
+        '''
+        If the classifier is not initialized yet, randomly pick a document from the corpus.
+        Else, use active learing to pick a document
+        '''
+        if len(self.classes) < 2:
+            chosen_idx = random.randint(0, self.num_docs)
 
-
-                self.recommended_doc_ids.add(chosen_idx)
-                self.last_recommended_doc_id = chosen_idx
-
-                print('picked doc is ', chosen_idx)
-
-
-                return chosen_idx, -1
-            else:
+            while chosen_idx in self.recommended_doc_ids:
                 try:
-                    for ele in self.recommended_doc_ids:
-                        self.scores[ele] = float('-Inf')
+                    chosen_idx = random.randint(0, self.num_docs)
+                except Exception as e: 
+                    logging.info("An exception occurred at picking a document:", e)
 
-                    chosen_idx, chosen_topic, chosen_idx_in_topic = find_doc_for_TA(self.doc_probs, self.scores)
-                    self.update_median_prob(chosen_topic, chosen_idx_in_topic)
-                    
-                    while chosen_idx in self.recommended_doc_ids:
-                        print('Selected Documents still exists')
-                        chosen_idx, chosen_topic, chosen_idx_in_topic = find_doc_for_TA(self.doc_probs, self.scores)
-                        self.update_median_prob(chosen_topic, chosen_idx_in_topic)
 
-                    print('max median topic is ', chosen_topic)
+            self.recommended_doc_ids.add(chosen_idx)
+            self.last_recommended_doc_id = chosen_idx
 
-                    self.last_recommended_topic = chosen_topic
-                    self.recommended_doc_ids.add(chosen_idx)
-                    self.last_recommended_doc_id = chosen_idx
-                    
-
-                    return chosen_idx, self.scores[chosen_idx]
-                except:
-                    return None, -1
+            return chosen_idx, -1
         else:
-            if len(self.classes) < 2:
-                chosen_idx = random.randint(0, self.train_length)
-
-                while chosen_idx in self.recommended_doc_ids:
-                    try:
-                        chosen_idx = random.randint(0, self.train_length)
-                    except Exception as e: 
-                        print(e)
-
-
-                self.recommended_doc_ids.add(chosen_idx)
-                self.last_recommended_doc_id = chosen_idx
-                return chosen_idx, -1
-            else:
-
+            try:
                 for ele in self.recommended_doc_ids:
                     self.scores[ele] = float('-Inf')
 
-                chosen_idx = np.argmax(self.scores)
-                
-
-                '''
-                Don't show the users an already shown document
-                '''
+                chosen_idx, chosen_topic, chosen_idx_in_topic = active_selection(self.doc_probs, self.scores)
+                self.update_median_prob(chosen_topic, chosen_idx_in_topic)
+                    
                 while chosen_idx in self.recommended_doc_ids:
-                    print('Selected Documents still exists')
-                    self.scores[chosen_idx] = float('-Inf')
-                    try:
-                        chosen_idx = np.argmax(self.scores)
-                    except Exception as e: 
-                        print(e)
-                
+                    # logging.info('Selected Documents still exists')
+                    chosen_idx, chosen_topic, chosen_idx_in_topic = active_selection(self.doc_probs, self.scores)
+                    self.update_median_prob(chosen_topic, chosen_idx_in_topic)
 
-                print('Classifier in progess...')
-                print('\033[1mScore of the current document is {}\033[0m'.format(self.scores[chosen_idx]))
+                # logging.info('max median topic is ', chosen_topic)
+
+                self.last_recommended_topic = chosen_topic
                 self.recommended_doc_ids.add(chosen_idx)
                 self.last_recommended_doc_id = chosen_idx
+                    
+
                 return chosen_idx, self.scores[chosen_idx]
+            except Exception as e:
+                logging.info("An exception occurred at picking a document:", e)
+                return None, -1
+       
 
-
+    '''
+    Select a document from the list by a preference function
+    '''
     def recommend_document(self, update):
         document_id, score = self.preference(update)
-
-        print(self.classes)
+        # logging.info(self.classes)
         return document_id, score
 
+    '''
+    Train the classifier with existing labeled documents
+    '''
     def fit_classifier(self, initialized= False):
         if initialized:
-            for i in range(len(self.labels_track)):
-                self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            # for i in range(len(self.labels_track)):
+                # self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            
+            self.classifier.fit(self.documents_track, self.labels_track)
         else:
             # for i in range(len(self.labels_track)//10):
-            self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            # if self.num_docs_labeled % 10 == 0:
+            # self.classifier.partial_fit(self.documents_track, self.labels_track, self.classes)
+            self.classifier = self.initialize_classifier()
+            self.classifier.fit(self.documents_track, self.labels_track)
 
         self.update_classifier()
 
@@ -229,89 +205,93 @@ class Active_Learning():
     calculate the entropy for each document in the document list
     '''
     def update_classifier(self):
-        guess_label_probas = self.classifier.predict_proba(self.text_vectorizer[0:self.train_length])
-        guess_label_logprobas = self.classifier.predict_log_proba(self.text_vectorizer[0:self.train_length])
+        guess_label_probas = self.classifier.predict_proba(self.text_vectorizer[0:self.num_docs])
+        guess_label_logprobas = self.classifier.predict_log_proba(self.text_vectorizer[0:self.num_docs])
         scores = -np.sum(guess_label_probas*guess_label_logprobas, axis = 1)
         self.scores = scores
-        
+    
+
+    '''
+    To add a label to a document, given the document id, which is the index of the document in the list, 
+    and the label of the document
+    '''
     def label(self, doc_id, user_label):
-        # if self.mode == 1:
-        if True:
-            if int(doc_id) != self.last_recommended_doc_id and self.mode != 0:
-                self.recommended_doc_ids.add(int(doc_id))
-                remove_value_from_dict_values(self.doc_probs, int(doc_id))
+        if int(doc_id) != self.last_recommended_doc_id:
+            self.recommended_doc_ids.add(int(doc_id))
+            remove_value_from_dict_values(self.doc_probs, int(doc_id))
             
             
-            if self.is_labeled(doc_id):
-                # if user_label in self.user_label_number_map:
-                if user_label in self.classes:
-                    # label_num = self.user_label_number_map[user_label]
-                    self.user_labels[doc_id] = user_label
-                    self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
-                    if len(self.classes) >= 2:
-                        self.fit_classifier()
-                        
-                else:
-                    self.user_labels[doc_id] = user_label
-                    self.classes.append(user_label)
-                    self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
-                    if len(self.classes) >= 2:
-                        self.classifier = self.initialize_classifier('logreg')
-
-                        self.fit_classifier(initialized=True)
-                        
-
-            elif user_label in self.classes:  
+        if self.is_labeled(doc_id):
+            # if user_label in self.user_label_number_map:
+            if user_label in self.classes:
+                # label_num = self.user_label_number_map[user_label]
                 self.user_labels[doc_id] = user_label
-                self.id_vectorizer_map[doc_id] = self.num_docs_labeled
-                # print(self.id_vectorizer_map)
-                '''
-                Adding documents and labels and track them
-                '''
-                self.labels_track.append(user_label)
-                self.general_labels_track.append(self.general_labels[doc_id])
-                
-                if self.documents_track is None:
-                    self.documents_track = self.text_vectorizer[doc_id]
-                else:
-                    self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
-                
-                if len(self.classes) >=  2:
-                    self.fit_classifier()
-                        
-
-                self.num_docs_labeled += 1
-
-                print('\033[1mnum docs labeled {}\033[0m'.format(self.num_docs_labeled))
-            else:
-                self.classes.append(user_label)
-                self.id_vectorizer_map[doc_id] = self.num_docs_labeled
-                # self.user_label_number_map[user_label] = user_label
-                # self.reverse_user_label_number_map[label_num] = user_label
-                # self.curr_label_num.append(label_num)
-                self.user_labels[doc_id] = user_label
-
-                self.labels_track.append(user_label)
-                self.general_labels_track.append(self.general_labels[doc_id])
-                if self.documents_track is None:
-                    self.documents_track = self.text_vectorizer[doc_id]
-                else:
-                    self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
-
+                self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
                 if len(self.classes) >= 2:
-                    self.classifier = self.initialize_classifier('logreg')
+                    self.fit_classifier()              
+            else:
+                self.user_labels[doc_id] = user_label
+                self.classes.append(user_label)
+                self.labels_track[self.id_vectorizer_map[doc_id]] = user_label
+
+                '''
+                Initilize a classifier once at least two classes exists
+                '''
+                if len(self.classes) >= 2:
+                    self.classifier = self.initialize_classifier()
+
                     self.fit_classifier(initialized=True)
+        elif user_label in self.classes:  
+            self.user_labels[doc_id] = user_label
+            self.id_vectorizer_map[doc_id] = self.num_docs_labeled
+            '''
+            Adding documents and labels and track them
+            '''
+            self.labels_track.append(user_label)
+            
+            '''
+            Add training data into to train the classifier
+            '''
+            if self.documents_track is None:
+                self.documents_track = self.text_vectorizer[doc_id]
+            else:
+                self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
+                
+            if len(self.classes) >=  2:
+                self.fit_classifier()
+                        
+
+            self.num_docs_labeled += 1
+
+            # logging.info('\033[1mnum docs labeled {}\033[0m'.format(self.num_docs_labeled))
+        else:
+            self.classes.append(user_label)
+            self.id_vectorizer_map[doc_id] = self.num_docs_labeled
+                
+            self.user_labels[doc_id] = user_label
+
+            self.labels_track.append(user_label)
+            if self.documents_track is None:
+                self.documents_track = self.text_vectorizer[doc_id]
+            else:
+                self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
+
+            if len(self.classes) >= 2:
+                self.classifier = self.initialize_classifier()
+                self.fit_classifier(initialized=True)
                     
     
-                self.num_docs_labeled += 1
+            self.num_docs_labeled += 1
         
     '''
-    given a document id, predict its associated label
+    given a document id, predict its associated label.
+    This function is for frontend only. The results are top 3 predictions of the classifier given a document ID, 
+    and a list that sorts the prediction outputs so users can quickly use it
     '''
     def predict_label(self, doc_id):       
-        # print('labels track {}'.format(self.labels_track))
+        # logging.info('labels track {}'.format(self.labels_track))
         doc_id = int(doc_id)
-        # print('user_label_number_map is {}'.format(self.user_label_number_map))
+        # logging.info('user_label_number_map is {}'.format(self.user_label_number_map))
         if len(self.classes) >= 2:
             classes = self.classifier.classes_
             probabilities = self.classifier.predict_proba(self.text_vectorizer[doc_id])[0]
@@ -320,52 +300,40 @@ class Active_Learning():
             
 
             
-            # result = []
-            result = ''
+            result = []
             for ele in top_three_indices:
                 # result += classes[ele] + '    Confidence: ' + str(round(probabilities[ele], 2)) + '\n'
-                # result.append(classes[ele])
-                result += classes[ele] + ','
+                result.append(classes[ele])
 
-            # print('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
-            print('prediction result is {}'.format(result))
+            # logging.info('id_vectorizer_map is {}'.format(self.id_vectorizer_map))
+            # logging.info('prediction result is {}'.format(result))
 
             classes = np.array(classes)
             dropdown_indices = classes[sorted_indices]
             
             return result, dropdown_indices
         else:
-            return "No Prediction", []
+            return ["Model suggestion starts after two distinct labels are created two labels to start active learning"], []
     
-    def eval_classifier(self):
-        local_training_preds = self.classifier.predict(self.text_vectorizer[0:self.train_length])
-        local_training_acc = accuracy_score(self.specific_labels[0:self.train_length], local_training_preds[0:self.train_length])
 
-        
-        if use_test_data == True:
-            local_testing_preds = self.classifier.predict(self.test_vectorizer)
-            local_testing_acc = accuracy_score(self.test_sub_labels, local_testing_preds)
-            test_purity = purity_score(self.test_general_labels, local_testing_preds)
-            test_RI = rand_score(self.test_general_labels, local_testing_preds)
-            test_NMI = normalized_mutual_info_score(self.test_general_labels, local_testing_preds)
-        else:
-            # print('setting test results to -1')
-            local_testing_acc = -1
-            test_purity = -1
-            test_RI = -1
-            test_NMI = -1
-        
-        classifier_purity = purity_score(self.general_labels[0:self.train_length], local_training_preds[0:self.train_length])
-        classifier_RI = rand_score(self.general_labels[0:self.train_length], local_training_preds[0:self.train_length])
-        classifier_NMI = normalized_mutual_info_score(self.general_labels[0:self.train_length], local_training_preds[0:self.train_length])
+    '''
+    Evaluate the cluster metrics given ground truth labels
+    '''
+    def eval_classifier(self, reference_labels):
+        local_training_preds = self.classifier.predict(self.text_vectorizer[0:self.num_docs])
+        with suppress_stdout():
+            classifier_purity = purity_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
+            classifier_RI = adjusted_rand_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
+            classifier_NMI = adjusted_mutual_info_score(reference_labels[0:self.num_docs], local_training_preds[0:self.num_docs])
 
-        
-        
-
-        print('train acc {}; purity {}; RI {}; NMI {}'.format(local_training_acc, classifier_purity, classifier_RI, classifier_NMI))
-        print('test acc {}; purity {}; RI {}; NMI {}'.format(local_testing_acc, test_purity, test_RI, test_NMI))
-        return local_training_acc, local_testing_acc, classifier_purity, classifier_RI, classifier_NMI, test_purity, test_RI, test_NMI
+         
+        logging.info('purity {}; RI {}; NMI {}'.format(classifier_purity, classifier_RI, classifier_NMI))
+        return classifier_purity, classifier_RI, classifier_NMI
     
+    '''
+    If we have new features want to append to the text embeddings, for example, we update topic models,
+    then update the text embedding and update the classifier
+    '''
     def update_text_vectorizer(self, new_text_vectorizer):
         self.text_vectorizer = new_text_vectorizer
         labeld_doc_indices = list(self.user_labels.keys())
@@ -378,6 +346,6 @@ class Active_Learning():
             else:
                 self.documents_track = vstack((self.documents_track, self.text_vectorizer[doc_id]))
 
-        self.classifier = self.initialize_classifier('logreg')
+        self.classifier = self.initialize_classifier()
 
         self.fit_classifier(initialized=True)

@@ -2,6 +2,6 @@ flask==2.2.3
 tomotopy
 pandas
 scikit-learn
-gensim==3.8.3
 torch
-spacy
+spacy==3.5.3
+contextualized_topic_models
