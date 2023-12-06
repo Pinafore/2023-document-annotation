@@ -183,7 +183,7 @@ class Preprocessing():
                 result['text'][str(counter)] = self.data[i]
 
                 if 'label' in result: result['label'][str(counter)] = labels[i]
-                if 'sub_label' in result: result['sub_labels'][str(counter)] = sub_labels[i]
+                if 'sub_labels' in result: result['sub_labels'][str(counter)] = sub_labels[i]
                 counter += 1
             else:
                 self.indices_to_void.append(i)
