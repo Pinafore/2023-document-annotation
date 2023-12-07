@@ -1,9 +1,9 @@
 # TENOR: Efficient Document Labeling/Topic Modeling Tool to Exploratory Data Analysis
 
-:fire:
+🔥
 TENOR is a user interface for speeding up document labeling process and reducing the number of documents needed to be labeled. See the paper for details:
 - Poursabzi-Sangdeh, Forough, et al. (2016). Alto: Active learning with topic overviews for speeding label induction and document labeling. ACL. https://aclanthology.org/P16-1110.pdf
-- New Paper Coming soon!!!:fire::fire::fire:
+- New Paper Coming soon!!!🔥🔥🔥
 
 
 ## References
