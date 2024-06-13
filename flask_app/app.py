@@ -113,6 +113,7 @@ def create_file(filename, columns):
         columns += '\n'
         f.write(columns)
 
+@app.route('/create_user', methods=['POST'])
 def create_user():
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -130,7 +131,7 @@ def create_user():
         cursor.execute('INSERT INTO users (user_id, mode) VALUES (?, ?)', (user_id, mode))
         conn.commit()
 
-        model_map = {0: 'LDA', 1: 'CTM'}
+        model_map = {0: 'LDA', 1: 'LDA'}
 
         user_instances[user_id] = User(user_id, all_texts['text'], model_type=model_map[mode], num_topics=num_topics, data_path=data_path, labels=true_labels)  # Create the User() object and store it in the user_instances dictionary
 
