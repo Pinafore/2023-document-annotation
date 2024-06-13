@@ -1,0 +1,2 @@
+user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
+14,30,land,-1,-1,-1,0:00:06,0,21,376,IMPLEMENTATION AND MONITORING
