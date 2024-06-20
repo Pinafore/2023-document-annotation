@@ -84,18 +84,24 @@ class User():
 
             if len(self.user_labels) >= 2:
                 preds, dropdown = self.alto.predict_label(int(doc_id))
-                result['prediction'] = preds
-                result['dropdown'] = dropdown
+                result['prediction'] = preds[0]
+                # result['dropdown'] = dropdown
+                result['dropdown'] = 'None'
             else:
-                result['prediction'] = ['']
-                result['dropdown'] = []
+                # result['prediction'] = ['']
+                # result['dropdown'] = []
+                result['prediction'] = ""
+                result['dropdown'] = "None"
             # logging.info('result', result)
 
             return result
         elif self.model_type == 'no_topic':
             preds, dropdown = self.alto.predict_label(int(doc_id))
-            result['prediction'] = preds
-            result['dropdown'] = dropdown
+            # result['prediction'] = preds
+            # result['dropdown'] = dropdown
+            result['prediction'] = preds[0]
+            # result['dropdown'] = dropdown
+            result['dropdown'] = 'None'
 
             topics = {"1": {"spans": [], "keywords": []}}
             result['topic'] = topics
