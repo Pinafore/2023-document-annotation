@@ -1,2 +1,0 @@
-user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
-6,4775,force,-1,-1,-1,0:00:05,0,14,6698,talk

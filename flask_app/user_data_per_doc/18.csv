@@ -1,5 +1,0 @@
-user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
-18,1005,daniel,-1,-1,-1,0:00:08,0,1,362,Law, Crime, and Family Issues
-18,362,danielm,0.14823107926556203,0.4379477277141348,0.011146366257352837,0:02:30,0,7,427,Community Development and Housing Issues
-18,427,danielmdanielo,0.17957904164800717,0.547192086124233,0.05515229673151262,0:00:10,0,22,116,Public Lands and Water Management
-18,29,lets see,0.19973130317957905,0.6916555512217358,0.07140661547185996,0:00:09,0,10,708,Energy

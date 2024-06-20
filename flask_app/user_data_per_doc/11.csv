@@ -1,3 +1,0 @@
-user_id,doc_id,label,purity,randIndex,NMI,responseTime,sLDAUpFreq,topKeywords,recommendID,actualLabel
-11,3490,next,-1,-1,-1,0:00:03,0,27,4170,Health
-11,4170,a,0.2269083304287208,0.5260213726020206,0.0801742683082498,0:00:03,0,10,586,Transportation
