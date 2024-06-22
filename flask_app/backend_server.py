@@ -84,7 +84,7 @@ class User():
 
             if len(self.user_labels) >= 2:
                 preds, dropdown = self.alto.predict_label(int(doc_id))
-                result['prediction'] = preds[0]
+                result['prediction'] = '\n'.join(preds)
                 # result['dropdown'] = dropdown
                 result['dropdown'] = 'None'
             else:
@@ -99,7 +99,7 @@ class User():
             preds, dropdown = self.alto.predict_label(int(doc_id))
             # result['prediction'] = preds
             # result['dropdown'] = dropdown
-            result['prediction'] = preds[0]
+            result['prediction'] = '\n'.join(preds)
             # result['dropdown'] = dropdown
             result['dropdown'] = 'None'
 
